@@ -72,7 +72,7 @@ export default function Screen1() {
 
                     {/* Secondary button */}
                     <TouchableOpacity
-                        onPress={() => router.push("/(onboarding)/screen2")}
+                        onPress={() => router.push("/(onboarding)/screen3")}
                         activeOpacity={0.8}
                         className="bg-[#1a1a2e] py-4 rounded-2xl items-center mb-2"
                     >
