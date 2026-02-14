@@ -61,7 +61,7 @@ export default function Screen1() {
 
                     {/* Primary button */}
                     <TouchableOpacity
-                        onPress={() => router.push("/(onboarding)/screen2")}
+                        onPress={() => router.push("/(onboarding)/create-wallet")}
                         activeOpacity={0.8}
                         className="bg-blue-500 py-4 rounded-2xl items-center mb-3"
                     >
@@ -72,7 +72,7 @@ export default function Screen1() {
 
                     {/* Secondary button */}
                     <TouchableOpacity
-                        onPress={() => router.push("/(onboarding)/screen3")}
+                        onPress={() => router.push("/(onboarding)/import-wallet")}
                         activeOpacity={0.8}
                         className="bg-[#1a1a2e] py-4 rounded-2xl items-center mb-2"
                     >

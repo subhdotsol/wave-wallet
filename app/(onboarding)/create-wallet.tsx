@@ -102,7 +102,7 @@ export default function Screen2() {
             <View className="flex-1 justify-end px-8">
                 <SafeAreaView edges={["bottom"]}>
                     <TouchableOpacity
-                        onPress={() => router.push("/(onboarding)/screen3")}
+                        onPress={() => router.push("/(onboarding)/recovery-phrase")}
                         activeOpacity={0.8}
                         className="bg-[#1a1a2e] py-4 rounded-2xl items-center mb-2"
                     >
