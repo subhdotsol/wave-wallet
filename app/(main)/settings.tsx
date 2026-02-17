@@ -149,40 +149,28 @@ function MenuItem({ icon, label, rightText, rightIcon, onPress }: {
         <TouchableOpacity
             onPress={onPress}
             activeOpacity={0.7}
-            style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingVertical: 16,
-                paddingHorizontal: 16,
-            }}
+            className="flex-row items-center py-4 px-4"
         >
-            <View style={{ marginRight: 14 }}>{icon}</View>
-            <Text style={{ fontFamily: "SNPro-Medium", color: "white", fontSize: 15, flex: 1 }}>{label}</Text>
+            <View className="mr-3.5">{icon}</View>
+            <Text className="text-white text-[15px] flex-1" style={{ fontFamily: "SNPro-Medium" }}>{label}</Text>
             {rightText && (
-                <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 14, marginRight: 8 }}>{rightText}</Text>
+                <Text className="text-[#888] text-sm mr-2" style={{ fontFamily: "SNPro-Regular" }}>{rightText}</Text>
             )}
             {rightIcon || <ChevronRightIcon />}
         </TouchableOpacity>
     );
 }
 
-function MenuSection({ children, style }: { children: React.ReactNode; style?: any }) {
+function MenuSection({ children }: { children: React.ReactNode }) {
     return (
-        <View style={[{
-            backgroundColor: "#161625",
-            borderRadius: 16,
-            marginBottom: 12,
-            borderWidth: 1,
-            borderColor: "#1e1e30",
-            overflow: "hidden",
-        }, style]}>
+        <View className="bg-[#161625] rounded-2xl mb-3 border border-[#1e1e30] overflow-hidden">
             {children}
         </View>
     );
 }
 
 function MenuDivider() {
-    return <View style={{ height: 1, backgroundColor: "#1e1e30", marginLeft: 52 }} />;
+    return <View className="h-px bg-[#1e1e30] ml-[52px]" />;
 }
 
 // ─── Main Component ─────────────────────────────────────────────────
@@ -193,30 +181,22 @@ export default function Settings() {
     return (
         <SafeAreaView className="flex-1 bg-[#0e0e1a]">
             {/* Header */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 }}>
-                <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 28 }}>Settings</Text>
-                <TouchableOpacity onPress={() => router.back()} style={{ padding: 4 }}>
+            <View className="flex-row justify-between items-center px-5 pt-2 pb-4">
+                <Text className="text-white text-[28px]" style={{ fontFamily: "SNPro-Bold" }}>Settings</Text>
+                <TouchableOpacity onPress={() => router.back()} className="p-1">
                     <CloseIcon />
                 </TouchableOpacity>
             </View>
 
             <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
                 {/* Search Bar */}
-                <View style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#1e1e30",
-                    borderRadius: 12,
-                    paddingHorizontal: 14,
-                    paddingVertical: 12,
-                    marginBottom: 16,
-                    gap: 10,
-                }}>
+                <View className="flex-row items-center bg-[#1e1e30] rounded-xl px-3.5 py-3 mb-4 gap-2.5">
                     <SearchIcon />
                     <TextInput
                         placeholder="Search"
                         placeholderTextColor="#666"
-                        style={{ flex: 1, color: "white", fontFamily: "SNPro-Regular", fontSize: 15, padding: 0 }}
+                        className="flex-1 text-white text-[15px] p-0"
+                        style={{ fontFamily: "SNPro-Regular" }}
                     />
                 </View>
 
@@ -225,17 +205,12 @@ export default function Settings() {
                     <TouchableOpacity
                         onPress={() => router.push("/(main)/profile")}
                         activeOpacity={0.7}
-                        style={{ flexDirection: "row", alignItems: "center", padding: 16 }}
+                        className="flex-row items-center p-4"
                     >
-                        <View style={{
-                            width: 40, height: 40, borderRadius: 20,
-                            backgroundColor: "#d4e157",
-                            justifyContent: "center", alignItems: "center",
-                            marginRight: 12,
-                        }}>
-                            <Text style={{ fontSize: 18 }}>🌊</Text>
+                        <View className="w-10 h-10 rounded-full bg-[#d4e157] justify-center items-center mr-3">
+                            <Text className="text-lg">🌊</Text>
                         </View>
-                        <Text style={{ fontFamily: "SNPro-SemiBold", color: "white", fontSize: 16, flex: 1 }}>@wavewallet</Text>
+                        <Text className="text-white text-base flex-1" style={{ fontFamily: "SNPro-SemiBold" }}>@wavewallet</Text>
                         <ChevronRightIcon />
                     </TouchableOpacity>
                 </MenuSection>
@@ -273,7 +248,7 @@ export default function Settings() {
                 </MenuSection>
 
                 {/* Bottom spacer */}
-                <View style={{ height: 40 }} />
+                <View className="h-10" />
             </ScrollView>
         </SafeAreaView>
     );

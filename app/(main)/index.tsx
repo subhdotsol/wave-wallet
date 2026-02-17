@@ -1,8 +1,8 @@
-import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import Svg, { Path, Circle, Rect, G, Defs, ClipPath } from "react-native-svg";
+import Svg, { Path, Circle, Rect } from "react-native-svg";
 
 // ─── Icon Components ────────────────────────────────────────────────
 
@@ -118,7 +118,7 @@ function ChevronRight() {
 
 function SolanaLogo() {
     return (
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: "#000", justifyContent: "center", alignItems: "center" }}>
+        <View className="w-11 h-11 rounded-full bg-black justify-center items-center">
             <Svg width={26} height={26} viewBox="0 0 24 24" fill="none">
                 <Path d="M4 16.5h13.5l2.5-2.5H6.5L4 16.5z" fill="#9945FF" />
                 <Path d="M4 7.5L6.5 10H20l-2.5-2.5H4z" fill="#14F195" />
@@ -130,7 +130,7 @@ function SolanaLogo() {
 
 function EthereumLogo() {
     return (
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: "#3c3c5a", justifyContent: "center", alignItems: "center" }}>
+        <View className="w-11 h-11 rounded-full bg-[#3c3c5a] justify-center items-center">
             <Svg width={20} height={28} viewBox="0 0 20 32" fill="none">
                 <Path d="M10 0l10 16.5L10 22 0 16.5 10 0z" fill="#8C8CA1" opacity={0.8} />
                 <Path d="M10 24l10-7.5L10 32 0 16.5 10 24z" fill="#C0C0D0" />
@@ -141,15 +141,15 @@ function EthereumLogo() {
 
 function BitcoinLogo() {
     return (
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: "#f7931a", justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>₿</Text>
+        <View className="w-11 h-11 rounded-full bg-[#f7931a] justify-center items-center">
+            <Text className="text-white text-[22px] font-bold">₿</Text>
         </View>
     );
 }
 
 function MonadLogo() {
     return (
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: "#7c5fe3", justifyContent: "center", alignItems: "center" }}>
+        <View className="w-11 h-11 rounded-full bg-[#7c5fe3] justify-center items-center">
             <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
                 <Circle cx={12} cy={12} r={8} stroke="white" strokeWidth={2} />
                 <Path d="M8 12a4 4 0 108 0 4 4 0 00-8 0" fill="white" opacity={0.3} />
@@ -198,18 +198,14 @@ export default function Home() {
                     <TouchableOpacity
                         onPress={() => router.push("/(main)/profile-drawer")}
                         activeOpacity={0.7}
-                        style={{
-                            width: 40, height: 40, borderRadius: 20,
-                            backgroundColor: "#d4e157",
-                            justifyContent: "center", alignItems: "center",
-                        }}
+                        className="w-10 h-10 rounded-full bg-[#d4e157] justify-center items-center"
                     >
-                        <Text style={{ fontSize: 20 }}>🌊</Text>
+                        <Text className="text-xl">🌊</Text>
                     </TouchableOpacity>
                     {/* Name */}
                     <View>
-                        <Text style={{ fontFamily: "SNPro-Regular" }} className="text-gray-400 text-xs">@wavewallet</Text>
-                        <Text style={{ fontFamily: "SNPro-Bold" }} className="text-white text-base">Account 1</Text>
+                        <Text className="text-gray-400 text-xs" style={{ fontFamily: "SNPro-Regular" }}>@wavewallet</Text>
+                        <Text className="text-white text-base" style={{ fontFamily: "SNPro-Bold" }}>Account 1</Text>
                     </View>
                 </View>
                 <View className="flex-row items-center gap-4">
@@ -222,10 +218,10 @@ export default function Home() {
                 {/* Balance Section */}
                 <View className="px-5 pt-4 pb-6">
                     <TouchableOpacity onPress={() => setBalanceVisible(!balanceVisible)}>
-                        <Text style={{ fontFamily: "SNPro-Bold" }} className="text-white text-4xl">
+                        <Text className="text-white text-4xl" style={{ fontFamily: "SNPro-Bold" }}>
                             {balanceVisible ? "$0.00" : "——"}
                         </Text>
-                        <Text style={{ fontFamily: "SNPro-Regular" }} className="text-gray-500 text-lg mt-1">
+                        <Text className="text-gray-500 text-lg mt-1" style={{ fontFamily: "SNPro-Regular" }}>
                             {balanceVisible ? "$0.00" : "·"}
                         </Text>
                     </TouchableOpacity>
@@ -237,19 +233,10 @@ export default function Home() {
                         <TouchableOpacity
                             key={btn.label}
                             activeOpacity={0.7}
-                            style={{
-                                width: 78,
-                                height: 78,
-                                borderRadius: 16,
-                                backgroundColor: "#1a1a2e",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                borderWidth: 1,
-                                borderColor: "#2a2a3e",
-                            }}
+                            className="w-[78px] h-[78px] rounded-2xl bg-[#1a1a2e] justify-center items-center border border-[#2a2a3e]"
                         >
                             <btn.Icon />
-                            <Text style={{ fontFamily: "SNPro-Medium", marginTop: 6 }} className="text-gray-300 text-xs">
+                            <Text className="text-gray-300 text-xs mt-1.5" style={{ fontFamily: "SNPro-Medium" }}>
                                 {btn.label}
                             </Text>
                         </TouchableOpacity>
@@ -258,7 +245,7 @@ export default function Home() {
 
                 {/* Tokens Section Header */}
                 <TouchableOpacity className="flex-row items-center px-5 mb-4">
-                    <Text style={{ fontFamily: "SNPro-Bold" }} className="text-white text-xl mr-1">Tokens</Text>
+                    <Text className="text-white text-xl mr-1" style={{ fontFamily: "SNPro-Bold" }}>Tokens</Text>
                     <ChevronRight />
                 </TouchableOpacity>
 
@@ -268,39 +255,30 @@ export default function Home() {
                         <TouchableOpacity
                             key={`${token.symbol}-${index}`}
                             activeOpacity={0.7}
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                backgroundColor: "#161625",
-                                borderRadius: 16,
-                                padding: 14,
-                                marginBottom: 8,
-                                borderWidth: 1,
-                                borderColor: "#1e1e30",
-                            }}
+                            className="flex-row items-center bg-[#161625] rounded-2xl p-3.5 mb-2 border border-[#1e1e30]"
                         >
                             {/* Token Logo */}
                             <token.Logo />
 
                             {/* Token Info */}
-                            <View style={{ flex: 1, marginLeft: 12 }}>
-                                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                                    <Text style={{ fontFamily: "SNPro-SemiBold", color: "white", fontSize: 16 }}>
+                            <View className="flex-1 ml-3">
+                                <View className="flex-row items-center gap-1">
+                                    <Text className="text-white text-base" style={{ fontFamily: "SNPro-SemiBold" }}>
                                         {token.name}
                                     </Text>
                                     {token.verified && <VerifiedBadge />}
                                 </View>
-                                <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 13, marginTop: 2 }}>
+                                <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "SNPro-Regular" }}>
                                     {token.balance} {token.symbol}
                                 </Text>
                             </View>
 
                             {/* Token Value */}
-                            <View style={{ alignItems: "flex-end" }}>
-                                <Text style={{ fontFamily: "SNPro-SemiBold", color: "white", fontSize: 16 }}>
+                            <View className="items-end">
+                                <Text className="text-white text-base" style={{ fontFamily: "SNPro-SemiBold" }}>
                                     {token.usdValue}
                                 </Text>
-                                <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 13, marginTop: 2 }}>
+                                <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "SNPro-Regular" }}>
                                     {token.usdSecondary}
                                 </Text>
                             </View>
@@ -309,26 +287,16 @@ export default function Home() {
                 </View>
 
                 {/* Bottom spacer for tab bar */}
-                <View style={{ height: 100 }} />
+                <View className="h-[100px]" />
             </ScrollView>
 
             {/* Bottom Tab Bar */}
-            <View style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                backgroundColor: "#0e0e1a",
-                borderTopWidth: 1,
-                borderTopColor: "#1e1e30",
-                paddingBottom: 30,
-                paddingTop: 12,
-            }}>
+            <View className="absolute bottom-0 left-0 right-0 bg-[#0e0e1a] border-t border-[#1e1e30] pb-[30px] pt-3">
                 <View className="flex-row justify-around items-center px-4">
                     {TAB_ITEMS.map((tab) => (
                         <TouchableOpacity
                             key={tab.label}
-                            style={{ alignItems: "center", gap: 4 }}
+                            className="items-center gap-1"
                             activeOpacity={0.7}
                         >
                             <tab.Icon active={tab.active} />

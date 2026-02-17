@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import Svg, { Path, Circle, Rect, Line } from "react-native-svg";
+import Svg, { Path, Circle } from "react-native-svg";
 
 // ─── Icons ──────────────────────────────────────────────────────────
 
@@ -64,112 +64,74 @@ export default function ProfileDrawer() {
         <SafeAreaView className="flex-1 bg-[#0e0e1a]">
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Header: Avatar + Close */}
-                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                <View className="flex-row justify-between items-start px-5 pt-2 pb-4">
+                    <View className="flex-row items-center gap-3">
                         {/* Avatar */}
-                        <View style={{
-                            width: 44, height: 44, borderRadius: 22,
-                            backgroundColor: "#d4e157",
-                            justifyContent: "center", alignItems: "center",
-                        }}>
-                            <Text style={{ fontSize: 22 }}>🌊</Text>
+                        <View className="w-11 h-11 rounded-full bg-[#d4e157] justify-center items-center">
+                            <Text className="text-[22px]">🌊</Text>
                         </View>
                         {/* Name */}
                         <View>
-                            <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 18 }}>@wavewallet</Text>
-                            <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 13, marginTop: 2 }}>0 followers</Text>
+                            <Text className="text-white text-lg" style={{ fontFamily: "SNPro-Bold" }}>@wavewallet</Text>
+                            <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "SNPro-Regular" }}>0 followers</Text>
                         </View>
                     </View>
-                    <TouchableOpacity
-                        onPress={() => router.back()}
-                        style={{ padding: 4, marginTop: 4 }}
-                    >
+                    <TouchableOpacity onPress={() => router.back()} className="p-1 mt-1">
                         <CloseIcon />
                     </TouchableOpacity>
                 </View>
 
                 {/* Profile / Settings Buttons */}
-                <View style={{ flexDirection: "row", paddingHorizontal: 20, gap: 12, marginBottom: 28 }}>
+                <View className="flex-row px-5 gap-3 mb-7">
                     <TouchableOpacity
                         onPress={() => router.push("/(main)/profile")}
                         activeOpacity={0.7}
-                        style={{
-                            flex: 1,
-                            backgroundColor: "#1e1e30",
-                            borderRadius: 14,
-                            paddingVertical: 16,
-                            alignItems: "center",
-                            gap: 6,
-                            borderWidth: 1,
-                            borderColor: "#2a2a3e",
-                        }}
+                        className="flex-1 bg-[#1e1e30] rounded-[14px] py-4 items-center gap-1.5 border border-[#2a2a3e]"
                     >
                         <ProfileIcon />
-                        <Text style={{ fontFamily: "SNPro-Medium", color: "white", fontSize: 13 }}>Profile</Text>
+                        <Text className="text-white text-[13px]" style={{ fontFamily: "SNPro-Medium" }}>Profile</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={() => router.push("/(main)/settings")}
                         activeOpacity={0.7}
-                        style={{
-                            flex: 1,
-                            backgroundColor: "#1e1e30",
-                            borderRadius: 14,
-                            paddingVertical: 16,
-                            alignItems: "center",
-                            gap: 6,
-                            borderWidth: 1,
-                            borderColor: "#2a2a3e",
-                        }}
+                        className="flex-1 bg-[#1e1e30] rounded-[14px] py-4 items-center gap-1.5 border border-[#2a2a3e]"
                     >
                         <SettingsIcon />
-                        <Text style={{ fontFamily: "SNPro-Medium", color: "white", fontSize: 13 }}>Settings</Text>
+                        <Text className="text-white text-[13px]" style={{ fontFamily: "SNPro-Medium" }}>Settings</Text>
                     </TouchableOpacity>
                 </View>
 
                 {/* Your Accounts */}
-                <View style={{ paddingHorizontal: 20 }}>
-                    <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 20, marginBottom: 14 }}>Your Accounts</Text>
+                <View className="px-5">
+                    <Text className="text-white text-xl mb-3.5" style={{ fontFamily: "SNPro-Bold" }}>Your Accounts</Text>
 
                     {ACCOUNTS.map((acct) => (
                         <TouchableOpacity
                             key={acct.id}
                             activeOpacity={0.7}
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                backgroundColor: "#1e1e30",
-                                borderRadius: 14,
-                                padding: 16,
-                                marginBottom: 10,
-                                borderWidth: 1,
-                                borderColor: "#2a2a3e",
-                            }}
+                            className="flex-row items-center bg-[#1e1e30] rounded-[14px] p-4 mb-2.5 border border-[#2a2a3e]"
                         >
                             {/* Account Badge */}
-                            <View style={{
-                                width: 44, height: 44, borderRadius: 22,
-                                backgroundColor: "#2a2a3e",
-                                justifyContent: "center", alignItems: "center",
-                            }}>
-                                <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 16 }}>{acct.id}</Text>
+                            <View className="w-11 h-11 rounded-full bg-[#2a2a3e] justify-center items-center relative">
+                                <Text className="text-white text-base" style={{ fontFamily: "SNPro-Bold" }}>{acct.id}</Text>
                                 {acct.active && (
-                                    <View style={{ position: "absolute", bottom: -2, right: -2 }}>
+                                    <View className="absolute -bottom-0.5 -right-0.5">
                                         <CheckBadge />
                                     </View>
                                 )}
                             </View>
 
                             {/* Account Info */}
-                            <View style={{ flex: 1, marginLeft: 12 }}>
-                                <Text style={{ fontFamily: "SNPro-SemiBold", color: "white", fontSize: 16 }}>{acct.name}</Text>
+                            <View className="flex-1 ml-3">
+                                <Text className="text-white text-base" style={{ fontFamily: "SNPro-SemiBold" }}>{acct.name}</Text>
                                 {acct.balance && (
-                                    <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 13, marginTop: 2 }}>{acct.balance}</Text>
+                                    <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "SNPro-Regular" }}>{acct.balance}</Text>
                                 )}
                             </View>
 
                             {/* Edit */}
-                            <TouchableOpacity style={{ padding: 8 }}>
+                            <TouchableOpacity className="p-2">
                                 <EditPenIcon />
                             </TouchableOpacity>
                         </TouchableOpacity>
@@ -178,17 +140,12 @@ export default function ProfileDrawer() {
             </ScrollView>
 
             {/* Add Account Button */}
-            <View style={{ paddingHorizontal: 20, paddingBottom: 30, paddingTop: 12 }}>
+            <View className="px-5 pb-[30px] pt-3">
                 <TouchableOpacity
                     activeOpacity={0.7}
-                    style={{
-                        backgroundColor: "#c8b2ff",
-                        borderRadius: 16,
-                        paddingVertical: 16,
-                        alignItems: "center",
-                    }}
+                    className="bg-[#c8b2ff] rounded-2xl py-4 items-center"
                 >
-                    <Text style={{ fontFamily: "SNPro-SemiBold", color: "#0e0e1a", fontSize: 16 }}>Add Account</Text>
+                    <Text className="text-[#0e0e1a] text-base" style={{ fontFamily: "SNPro-SemiBold" }}>Add Account</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

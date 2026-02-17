@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import Svg, { Path, Circle, Polygon, Line, Rect } from "react-native-svg";
+import Svg, { Path, Circle, Polygon } from "react-native-svg";
 
 // ─── Icons ──────────────────────────────────────────────────────────
 
@@ -17,7 +17,7 @@ function BackArrow() {
 
 function NoActivityIllustration() {
     return (
-        <View style={{ alignItems: "center", gap: 4 }}>
+        <View className="items-center gap-1">
             <Svg width={80} height={80} viewBox="0 0 80 80" fill="none">
                 {/* Star */}
                 <Polygon points="40,8 44,24 60,24 47,33 52,48 40,38 28,48 33,33 20,24 36,24" fill="#14b8a6" />
@@ -43,82 +43,64 @@ export default function Profile() {
         <SafeAreaView className="flex-1 bg-[#0e0e1a]">
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Header */}
-                <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16, gap: 8 }}>
-                    <TouchableOpacity onPress={() => router.back()} style={{ padding: 4 }}>
+                <View className="flex-row items-center px-4 pt-2 pb-4 gap-2">
+                    <TouchableOpacity onPress={() => router.back()} className="p-1">
                         <BackArrow />
                     </TouchableOpacity>
-                    <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 18 }}>@wavewallet</Text>
+                    <Text className="text-white text-lg" style={{ fontFamily: "SNPro-Bold" }}>@wavewallet</Text>
                 </View>
 
                 {/* Profile Info Section */}
-                <View style={{ paddingHorizontal: 20 }}>
+                <View className="px-5">
                     {/* Avatar + Stats Row */}
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 20, marginBottom: 20 }}>
+                    <View className="flex-row items-center gap-5 mb-5">
                         {/* Avatar */}
-                        <View style={{
-                            width: 56, height: 56, borderRadius: 28,
-                            backgroundColor: "#d4e157",
-                            justifyContent: "center", alignItems: "center",
-                        }}>
-                            <Text style={{ fontSize: 28 }}>🌊</Text>
+                        <View className="w-14 h-14 rounded-full bg-[#d4e157] justify-center items-center">
+                            <Text className="text-[28px]">🌊</Text>
                         </View>
 
                         {/* Stats */}
-                        <View style={{ flexDirection: "row", gap: 24 }}>
+                        <View className="flex-row gap-6">
                             <View>
-                                <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 12 }}>Trade Volume</Text>
-                                <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 16 }}>$0.00</Text>
+                                <Text className="text-[#888] text-xs" style={{ fontFamily: "SNPro-Regular" }}>Trade Volume</Text>
+                                <Text className="text-white text-base" style={{ fontFamily: "SNPro-Bold" }}>$0.00</Text>
                             </View>
                             <View>
-                                <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 12 }}>Followers</Text>
-                                <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 16 }}>0</Text>
+                                <Text className="text-[#888] text-xs" style={{ fontFamily: "SNPro-Regular" }}>Followers</Text>
+                                <Text className="text-white text-base" style={{ fontFamily: "SNPro-Bold" }}>0</Text>
                             </View>
                             <View>
-                                <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 12 }}>Following</Text>
-                                <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 16 }}>0</Text>
+                                <Text className="text-[#888] text-xs" style={{ fontFamily: "SNPro-Regular" }}>Following</Text>
+                                <Text className="text-white text-base" style={{ fontFamily: "SNPro-Bold" }}>0</Text>
                             </View>
                         </View>
                     </View>
 
                     {/* Edit / Share Buttons */}
-                    <View style={{ flexDirection: "row", gap: 12, marginBottom: 32 }}>
+                    <View className="flex-row gap-3 mb-8">
                         <TouchableOpacity
                             activeOpacity={0.7}
-                            style={{
-                                flex: 1,
-                                backgroundColor: "#c8b2ff",
-                                borderRadius: 14,
-                                paddingVertical: 14,
-                                alignItems: "center",
-                            }}
+                            className="flex-1 bg-[#c8b2ff] rounded-[14px] py-3.5 items-center"
                         >
-                            <Text style={{ fontFamily: "SNPro-SemiBold", color: "#0e0e1a", fontSize: 15 }}>Edit Profile</Text>
+                            <Text className="text-[#0e0e1a] text-[15px]" style={{ fontFamily: "SNPro-SemiBold" }}>Edit Profile</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             activeOpacity={0.7}
-                            style={{
-                                flex: 1,
-                                backgroundColor: "#1e1e30",
-                                borderRadius: 14,
-                                paddingVertical: 14,
-                                alignItems: "center",
-                                borderWidth: 1,
-                                borderColor: "#2a2a3e",
-                            }}
+                            className="flex-1 bg-[#1e1e30] rounded-[14px] py-3.5 items-center border border-[#2a2a3e]"
                         >
-                            <Text style={{ fontFamily: "SNPro-SemiBold", color: "white", fontSize: 15 }}>Share Profile</Text>
+                            <Text className="text-white text-[15px]" style={{ fontFamily: "SNPro-SemiBold" }}>Share Profile</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 {/* Recent Activity */}
-                <View style={{ paddingHorizontal: 20 }}>
-                    <Text style={{ fontFamily: "SNPro-Bold", color: "white", fontSize: 20, marginBottom: 40 }}>Recent Activity</Text>
+                <View className="px-5">
+                    <Text className="text-white text-xl mb-10" style={{ fontFamily: "SNPro-Bold" }}>Recent Activity</Text>
 
                     {/* Empty State */}
-                    <View style={{ alignItems: "center", paddingTop: 20, gap: 16 }}>
+                    <View className="items-center pt-5 gap-4">
                         <NoActivityIllustration />
-                        <Text style={{ fontFamily: "SNPro-Regular", color: "#888", fontSize: 14 }}>No activity to show yet.</Text>
+                        <Text className="text-[#888] text-sm" style={{ fontFamily: "SNPro-Regular" }}>No activity to show yet.</Text>
                     </View>
                 </View>
             </ScrollView>
