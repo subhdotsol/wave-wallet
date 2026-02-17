@@ -126,7 +126,7 @@ export default function Screen4() {
                                 <Text
                                     className="text-gray-500 mr-3"
                                     style={{
-                                        fontFamily: "SNPro-Regular",
+                                        fontFamily: "SNPro-Bold",
                                         width: 20,
                                     }}
                                 >
