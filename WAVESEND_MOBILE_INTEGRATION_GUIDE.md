@@ -52,18 +52,18 @@ WaveSend implements **privacy-preserving token transfers** using stealth address
 │  CRANK (Automatic — server-side, no user interaction):                  │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
 │  │ 1. REGISTER_DEPOSIT (0x3A) — Mark deposit ready for processing   │   │
-│  │ 2. INPUT_TO_POOL (0x3D)   — Move funds: Input Escrow → Pool     │    │
+│  │ 2. INPUT_TO_POOL (0x3D)   — Move funds: Input Escrow → Pool     │   │
 │  │ 3. PREPARE_OUTPUT (0x40)  — Create Output Escrow for receiver    │   │
-│  │ 4. POOL_TO_ESCROW (0x3E)  — Move funds: Pool → Output Escrow    │    │
+│  │ 4. POOL_TO_ESCROW (0x3E)  — Move funds: Pool → Output Escrow    │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 │                                                                         │
 │  RECEIVER (scanning + claim):                                           │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
 │  │ 1. Scan OutputEscrows + DepositRecords (get X-Wing ciphertext)   │   │
-│  │ 2. X-Wing decapsulate → sharedSecret                            │    │
+│  │ 2. X-Wing decapsulate → sharedSecret                            │   │
 │  │ 3. Verify: SHA256(sharedSecret || "stealth-derive") == stealth   │   │
-│  │ 4. CLAIM_ESCROW_V4 (0x27) on PER → TEE verifies + undelegates   │    │
-│  │ 5. WITHDRAW_FROM_OUTPUT_ESCROW (0x2F) on L1 → Funds to wallet   │    │
+│  │ 4. CLAIM_ESCROW_V4 (0x27) on PER → TEE verifies + undelegates   │   │
+│  │ 5. WITHDRAW_FROM_OUTPUT_ESCROW (0x2F) on L1 → Funds to wallet   │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -1044,7 +1044,29 @@ import { Stack } from 'expo-router';
 // ...rest of layout
 ```
 
-> **Checkpoint:** App still boots to home page. Run `npx expo start` and confirm no crashes.
+**✅ Acceptance Criteria for Step 1:**
+
+1. Run `npx expo start` → app boots to your home page with **no red error screen**
+2. Open the Expo dev tools console — no warnings about `Buffer is not defined` or `crypto is not defined`
+3. Add this temporary test in any screen component and verify it logs correctly:
+```typescript
+// Temporary — remove after testing
+import { Buffer } from 'buffer';
+console.log('Buffer works:', Buffer.from('hello').toString('hex')); 
+// Expected: "Buffer works: 68656c6c6f"
+
+import { sha3_256 } from 'js-sha3';
+console.log('SHA3 works:', sha3_256('test').slice(0, 16));
+// Expected: "SHA3 works: 36f028580bb02cc8" (first 16 chars)
+
+import { ed25519 } from '@noble/curves/ed25519';
+const privKey = ed25519.utils.randomPrivateKey();
+const pubKey = ed25519.getPublicKey(privKey);
+console.log('Ed25519 works:', pubKey.length);
+// Expected: "Ed25519 works: 32"
+```
+4. If you see `Can't find variable: crypto` → your `react-native-get-random-values` import is not the FIRST import
+5. If you see `Buffer is not defined` → your polyfills file isn't being imported before other code
 
 ---
 
@@ -1070,7 +1092,25 @@ export const connection = new Connection(RPC_URL, { commitment: 'confirmed' });
 export const perConnection = new Connection(PER_URL, { commitment: 'confirmed' });
 ```
 
-> **Checkpoint:** Import `connection` somewhere and call `connection.getSlot()`. It should return a number.
+**✅ Acceptance Criteria for Step 2:**
+
+1. Add this test in any screen's `useEffect`:
+```typescript
+import { connection } from '../lib/solana/connection';
+
+useEffect(() => {
+  connection.getSlot().then(slot => {
+    console.log('✅ Solana devnet connected. Current slot:', slot);
+    // Expected: a large number like 312847561
+  }).catch(err => {
+    console.error('❌ Solana connection failed:', err.message);
+  });
+}, []);
+```
+2. You should see `✅ Solana devnet connected. Current slot: XXXXXXXX` in your console
+3. If you see `Network request failed` → check your device/emulator has internet access
+4. If you see `URL is not a constructor` → your `react-native-url-polyfill` import is missing
+5. Verify `@solana/web3.js` version in `package.json` is `1.x.x` (NOT `2.x`) — run `npm ls @solana/web3.js` to check
 
 ---
 
@@ -1091,7 +1131,26 @@ Copy these files from `apps/web/src/lib/stealth/` → your Expo app `src/lib/ste
 
 **Do NOT copy** `stealth-worker.ts` or `stealth-worker-client.ts` — these are Web Worker files. You'll replace them in Step 5.
 
-> **Checkpoint:** All files compile without errors (fix any import paths). `npx expo start` still boots.
+**✅ Acceptance Criteria for Step 3:**
+
+1. Run `npx expo start` → app boots with **no red screen**
+2. Run this in your terminal to check for TypeScript errors:
+```bash
+npx tsc --noEmit 2>&1 | grep "stealth/"
+# Expected: NO output (no errors in stealth files)
+# If you see errors, they will tell you exactly which import path is broken
+```
+3. Add this temporary import test:
+```typescript
+import { PROGRAM_IDS, deriveStealthVaultPda } from '../lib/stealth/config';
+import { StealthKeyPair } from '../lib/stealth/crypto';
+import { DetectedEscrowV4 } from '../lib/stealth/scanner';
+
+console.log('✅ Stealth config loaded. Registry program:', PROGRAM_IDS.REGISTRY.toString());
+// Expected: "✅ Stealth config loaded. Registry program: DgoW9MneWt6B3mBZqDf52csXMtJpgqwa..."
+```
+4. Common fix needed: if `client.ts` imports from `./stealth-worker-client`, **comment those imports out** for now (you'll replace them in Step 5)
+5. If `per-privacy.ts` imports from `'./config'` and fails, check you copied `config.ts` correctly
 
 ---
 
@@ -1140,7 +1199,35 @@ export async function decryptDestinationWallet(
 > [!IMPORTANT]
 > Compare with the web `crypto.ts` to make sure the nonce derivation matches exactly. The web version derives nonce from `sharedSecret.slice(0, 12)` inside the encrypt function.
 
-> **Checkpoint:** `encryptDestinationWallet` and `decryptDestinationWallet` can round-trip a 32-byte buffer.
+**✅ Acceptance Criteria for Step 4:**
+
+1. Add this round-trip test in any screen:
+```typescript
+import { encryptDestinationWallet, decryptDestinationWallet } from '../lib/stealth/crypto';
+
+useEffect(() => {
+  (async () => {
+    // Create a fake 32-byte wallet pubkey and 32-byte shared secret
+    const fakeWallet = new Uint8Array(32).fill(0xAB);
+    const fakeSecret = new Uint8Array(32).fill(0xCD);
+
+    const encrypted = await encryptDestinationWallet(fakeWallet, fakeSecret);
+    console.log('Encrypted length:', encrypted.length);
+    // Expected: 48 (32 ciphertext + 16 auth tag)
+
+    const decrypted = await decryptDestinationWallet(encrypted, fakeSecret);
+    console.log('Decrypted length:', decrypted.length);
+    // Expected: 32
+
+    const match = fakeWallet.every((b, i) => b === decrypted[i]);
+    console.log('✅ AES-GCM round-trip:', match ? 'PASS' : '❌ FAIL');
+    // Expected: "✅ AES-GCM round-trip: PASS"
+  })();
+}, []);
+```
+2. You MUST see `PASS`. If you see `FAIL`, the nonce derivation doesn't match the web version
+3. If you see `createCipheriv is not a function` → `react-native-quick-crypto` native module isn't linked. Run `npx expo prebuild` and rebuild
+4. If you see `unsupported algorithm` → make sure you're using `'aes-256-gcm'` exactly
 
 ---
 
@@ -1220,7 +1307,52 @@ export async function cachePublicKeys(walletAddress: string, pubKeys: StealthPub
 }
 ```
 
-> **Checkpoint:** Import `key-manager.ts`, call `initializeKeys(someFakeBytes)`, then `isReady()` returns `true`. Call `wipeKeys()`, `isReady()` returns `false`.
+**✅ Acceptance Criteria for Step 5:**
+
+1. Add this test:
+```typescript
+import * as KeyManager from '../lib/stealth/key-manager';
+
+useEffect(() => {
+  // Use a deterministic 64-byte fake signature for testing
+  const fakeSig = new Uint8Array(64);
+  for (let i = 0; i < 64; i++) fakeSig[i] = i;
+
+  console.log('Before init - isReady:', KeyManager.isReady());
+  // Expected: false
+
+  const pubKeys = KeyManager.initializeKeys(fakeSig);
+  console.log('After init - isReady:', KeyManager.isReady());
+  // Expected: true
+
+  console.log('spendPubkey length:', pubKeys.spendPubkey.length);
+  // Expected: 32
+  console.log('viewPubkey length:', pubKeys.viewPubkey.length);
+  // Expected: 32
+  console.log('xwingPubkey length:', pubKeys.xwingPubkey.length);
+  // Expected: 1216
+
+  // Verify signature was zeroed (security check)
+  console.log('Signature zeroed:', fakeSig.every(b => b === 0));
+  // Expected: true
+
+  // Test getKeys returns non-null
+  const keys = KeyManager.getKeys();
+  console.log('Has private keys:', keys !== null && keys.spendPrivkey.length === 32);
+  // Expected: true
+
+  KeyManager.wipeKeys();
+  console.log('After wipe - isReady:', KeyManager.isReady());
+  // Expected: false
+  console.log('After wipe - getKeys:', KeyManager.getKeys());
+  // Expected: null
+
+  console.log('✅ Key Manager: ALL TESTS PASSED');
+}, []);
+```
+2. All 7 console logs should match the expected values
+3. Key thing to verify: `xwingPubkey.length === 1216` — this proves ML-KEM-768 key generation worked
+4. If `xwingPubkey.length` is wrong → `@noble/post-quantum` may not be installed or may have a version conflict
 
 ---
 
@@ -1238,7 +1370,33 @@ Search and replace these patterns in your copied `client.ts`:
 | `window.location.origin` | Your crank API URL constant (e.g. `CRANK_API_URL`) |
 | `fetch('/api/v1/...')` | Direct fetch to the actual endpoint URL |
 
-> **Checkpoint:** `WaveStealthClient` instantiates without errors. `new WaveStealthClient(connection)` works.
+**✅ Acceptance Criteria for Step 6:**
+
+1. Add this test:
+```typescript
+import { WaveStealthClient } from '../lib/stealth/client';
+import { connection } from '../lib/solana/connection';
+import { PublicKey } from '@solana/web3.js';
+
+useEffect(() => {
+  (async () => {
+    const client = new WaveStealthClient(connection);
+    console.log('✅ WaveStealthClient instantiated');
+
+    // Test: Check if a known devnet address is registered
+    const testAddr = new PublicKey('11111111111111111111111111111111');
+    const isReg = await client.isRecipientRegistered(testAddr);
+    console.log('System program registered?', isReg);
+    // Expected: false (system program is obviously not registered)
+
+    console.log('✅ Client RPC call works');
+  })();
+}, []);
+```
+2. No `window is not defined` or `Worker is not defined` errors
+3. The RPC call to `isRecipientRegistered` completes without throwing
+4. If you see `window is not defined` → you missed replacing `window.location.origin` somewhere in `client.ts`
+5. If you see `Worker is not defined` → you missed replacing a `StealthWorkerClient` reference
 
 ---
 
@@ -1290,7 +1448,49 @@ If using **Mobile Wallet Adapter (MWA)** for external wallets (Phantom, Solflare
 npm install @solana-mobile/mobile-wallet-adapter-protocol
 ```
 
-> **Checkpoint:** You can call `wallet.signMessage(new TextEncoder().encode("test"))` and get back a signature.
+**✅ Acceptance Criteria for Step 7:**
+
+1. Test your wallet adapter:
+```typescript
+import { useWallet } from './hooks/useWallet'; // your hook
+
+const { wallet } = useWallet();
+
+useEffect(() => {
+  if (!wallet) return;
+  (async () => {
+    // Test 1: Public key exists
+    console.log('Wallet pubkey:', wallet.publicKey.toString());
+    // Expected: a base58 string like "7xKX..." (your devnet wallet address)
+
+    // Test 2: Sign a message
+    const msg = new TextEncoder().encode('WaveSend test message');
+    const sig = await wallet.signMessage(msg);
+    console.log('Signature length:', sig.length);
+    // Expected: 64 (Ed25519 signature)
+
+    // Test 3: Sign a dummy transaction
+    const { Transaction, SystemProgram, PublicKey } = require('@solana/web3.js');
+    const tx = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: wallet.publicKey,
+        toPubkey: wallet.publicKey,
+        lamports: 0,
+      })
+    );
+    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+    tx.feePayer = wallet.publicKey;
+    const signedTx = await wallet.signTransaction(tx);
+    console.log('TX signed:', signedTx.signatures.length > 0);
+    // Expected: true
+
+    console.log('✅ Wallet adapter: ALL TESTS PASSED');
+  })();
+}, [wallet]);
+```
+2. If using embedded wallet: verify the address matches what you'd get from `Keypair.fromSecretKey(yourKey).publicKey`
+3. If using MWA: the Phantom/Solflare popup should appear when `signMessage` is called
+4. Signature length MUST be exactly 64 bytes — if not, your sign function implementation is wrong
 
 ---
 
@@ -1376,7 +1576,36 @@ export function useWaveSend() {
 }
 ```
 
-> **Checkpoint:** Hook mounts without error. `initializeKeys()` prompts the wallet, derives keys, `isInitialized` becomes `true`.
+**✅ Acceptance Criteria for Step 8:**
+
+1. Create a temporary test screen that uses the hook:
+```typescript
+import { useWaveSend } from '../hooks/useWaveSend';
+import { View, Text, Pressable } from 'react-native';
+
+export default function TestSendScreen() {
+  const { isInitialized, isRegistered, isLoading, error, initializeKeys } = useWaveSend();
+
+  return (
+    <View>
+      <Text>Initialized: {isInitialized ? '✅ YES' : '❌ NO'}</Text>
+      <Text>Registered: {isRegistered ? '✅ YES' : '❌ NO'}</Text>
+      <Text>Loading: {isLoading ? '⏳' : '—'}</Text>
+      <Text>Error: {error ?? 'none'}</Text>
+      <Pressable onPress={initializeKeys}>
+        <Text>🔑 Initialize Keys</Text>
+      </Pressable>
+    </View>
+  );
+}
+```
+2. **Before tapping Initialize:** Screen shows `Initialized: ❌ NO`
+3. **Tap Initialize → sign the stealth message** (wallet popup or embedded sign)
+4. **After signing:** Screen updates to `Initialized: ✅ YES`
+5. `isRegistered` will be `❌ NO` if this is a fresh wallet (never registered on devnet)
+6. `isRegistered` will be `✅ YES` if you previously registered this wallet via the web app
+7. No errors in the `Error` field
+8. **Re-open the app** (kill + relaunch) → `Initialized` goes back to `❌ NO` (keys are in-memory only, not persisted — this is correct behavior)
 
 ---
 
@@ -1406,7 +1635,31 @@ useEffect(() => {
 }, [isInitialized]);
 ```
 
-> **Checkpoint:** After initialization, scan returns an array (empty is fine if no payments sent yet).
+**✅ Acceptance Criteria for Step 9:**
+
+1. After calling `initializeKeys()` (from Step 8), the auto-claim hook should start scanning
+2. Check the console for scan logs:
+```
+// Expected console output (first scan is slower):
+"Scanning for escrows... (first run, no cache)"
+"Found X deposit records, Y output escrows"
+"Matched Z escrows for our wallet"
+```
+3. **If no payments have been sent to you:** `pendingClaims` array will be empty (`[]`) — this is correct
+4. **If you sent yourself a payment via the web app:** you should see 1+ items in `pendingClaims` within 20 seconds
+5. Verify scanning doesn't crash the app — watch for:
+   - No `TypeError` from X-Wing decapsulation (bad key format)
+   - No `RangeError` from buffer parsing (scanner offset wrong)
+   - No memory spikes (each scan should be ~1-5MB, not growing)
+6. To verify scanning works with actual data, send 0.001 SOL via the web app to your mobile wallet address, then wait:
+```
+// Expected after ~20 seconds:
+"Matched 1 escrows for our wallet"
+pendingClaims.length === 1
+pendingClaims[0].amount === 1000000n  // 0.001 SOL in lamports
+pendingClaims[0].isOurs === true
+pendingClaims[0].isWithdrawn === false
+```
 
 ---
 
@@ -1442,7 +1695,19 @@ Now design your home screen with NativeWind. Phantom's layout has:
 3. **`TokenList`** — `FlatList` showing all tokens with Jupiter icon URLs (`https://img.icons8.com/...` or `cdn.jsdelivr.net`)
 4. **`PendingClaims`** — shows results from `useAutoClaim` hook
 
-> **Checkpoint:** Home screen renders with balance and action buttons. Pressing "Send" navigates forward.
+**✅ Acceptance Criteria for Step 10:**
+
+1. Home screen renders without crash on both iOS simulator and Android emulator
+2. **Balance card** shows your wallet's SOL balance (airdrop devnet SOL first: `solana airdrop 2 <your-pubkey> --url devnet`)
+3. **Token list** shows at least SOL with correct balance (matches what Solscan devnet shows)
+4. **Action buttons** (Receive/Send/Swap) are visible and tappable
+5. **Tapping "Send"** navigates to the send flow (even if screens are empty placeholders)
+6. If `useAutoClaim` is connected and has pending claims, the **Pending Claims** section shows them
+7. Pull-to-refresh (if implemented) updates the balance
+8. No layout issues — test with:
+   - Small screen (iPhone SE / small Android)
+   - Large screen (iPhone 15 Pro Max)
+   - Dark mode and light mode (NativeWind should handle both)
 
 ---
 
@@ -1473,7 +1738,26 @@ app/
    - Show "Send Privately" button → calls `send()`
 5. **Success (`success.tsx`)** — Show checkmark, transaction signature, Solscan link
 
-> **Checkpoint:** Full flow from token selection to confirm screen works. Send button triggers the actual `waveSendV4` call on devnet.
+**✅ Acceptance Criteria for Step 11:**
+
+1. **Token Selection:** Tap SOL → navigates to Recipient screen with SOL selected
+2. **Recipient:** Paste a valid devnet address → green checkmark or "Registered ✅" indicator
+   - Paste an invalid string → red error "Invalid Solana address"
+   - Paste a valid address that hasn't registered → yellow warning "Recipient not registered for private payments"
+3. **Amount:** Enter `0.01` → shows `0.01 SOL` and equivalent USD value (if you have price feed)
+   - Entering more than your balance → shows "Insufficient balance" error
+   - MAX button fills your balance minus rent-exempt minimum (~0.00089 SOL)
+4. **Confirm screen:** Shows summary: token (SOL), amount (0.01), recipient (truncated address)
+   - If not initialized → shows "Initialize Keys" button first
+   - If not registered → shows "Register" button (one-time, gasless)
+   - "Send Privately" button is active
+5. **Tap Send Privately:**
+   - Loading indicator appears
+   - Console shows progress: `Preparing transactions... (1/2)` → `Signing transactions... (2/2)`
+   - Wallet popup asks to sign 4 transactions (or signs automatically for embedded wallet)
+   - After ~10-15 seconds: Success screen with transaction signature
+6. **Verify on Solscan:** Open `https://solscan.io/tx/<signature>?cluster=devnet` — transaction exists
+7. **Verify balance:** Your SOL balance decreased by 0.01 + TX fees
 
 ---
 
@@ -1493,7 +1777,23 @@ This screen uses `useAutoClaim`:
 - "Claim" button per item → calls `claimViaTEE()` on PER, then `withdrawFromOutputEscrow()` on L1 via Kora
 - Show claimed history with Solscan links
 
-> **Checkpoint:** After sending SOL from another wallet, this screen detects the incoming payment within ~20 seconds and shows a "Claim" button.
+**✅ Acceptance Criteria for Step 12:**
+
+1. Open Activity screen → shows empty state "No incoming payments" (if nothing sent to you)
+2. **From the web app (or another wallet's mobile app):** Send 0.005 SOL to your mobile wallet address
+3. Wait 10-20 seconds on the Activity screen
+4. **A new item appears:**
+   - Shows amount: `0.005 SOL`
+   - Shows status: `Pending` or `Ready to Claim`
+   - Shows a **"Claim"** button
+5. **Tap Claim:**
+   - Loading spinner appears on the Claim button
+   - Console shows: `"Claiming via TEE..."` → `"Withdrawing from output escrow..."` → `"Claim complete!"`
+   - The item status changes to `Claimed ✅`
+   - Your wallet balance increases by ~0.005 SOL (minus small rent)
+6. **After claiming:** The item moves to a "History" section or grays out
+7. Refreshing the screen doesn't show the claimed item as pending again
+8. Edge case: if the crank hasn't processed the deposit yet, the claim button should be disabled with text like "Processing..."
 
 ---
 

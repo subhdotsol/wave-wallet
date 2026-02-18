@@ -1,3 +1,4 @@
+import "../src/polyfills"; // ← MUST be the very first import (Buffer, crypto, URL polyfills)
 import "../global.css";
 import { Stack } from "expo-router";
 import { useFonts } from "expo-font";

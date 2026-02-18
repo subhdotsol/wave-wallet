@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import Svg, { Path, Circle, Rect } from "react-native-svg";
+import { walletManager } from "../../src/lib/wallet";
 
 // ─── Icon Components ────────────────────────────────────────────────
 
@@ -188,6 +189,7 @@ const TAB_ITEMS = [
 export default function Home() {
     const [balanceVisible, setBalanceVisible] = useState(false);
     const router = useRouter();
+    const activeAccount = walletManager.getActiveAccount();
 
     return (
         <SafeAreaView className="flex-1 bg-[#0e0e1a]">
@@ -204,8 +206,8 @@ export default function Home() {
                     </TouchableOpacity>
                     {/* Name */}
                     <View>
-                        <Text className="text-gray-400 text-xs" style={{ fontFamily: "SNPro-Regular" }}>@wavewallet</Text>
-                        <Text className="text-white text-base" style={{ fontFamily: "SNPro-Bold" }}>Account 1</Text>
+                        <Text className="text-gray-400 text-xs" style={{ fontFamily: "SNPro-Regular" }}>{activeAccount?.shortAddress ?? "No wallet"}</Text>
+                        <Text className="text-white text-base" style={{ fontFamily: "SNPro-Bold" }}>{activeAccount?.name ?? "Create Wallet"}</Text>
                     </View>
                 </View>
                 <View className="flex-row items-center gap-4">

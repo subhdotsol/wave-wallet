@@ -213,6 +213,7 @@ export default function Screen3() {
                         className="flex-row items-center bg-[#1e1e30] py-4 px-5 rounded-2xl mb-3"
                         onPress={() => {
                             closeSheet();
+                            router.push("/(onboarding)/seed-phrase-import");
                         }}
                     >
                         <Ionicons
@@ -236,9 +237,10 @@ export default function Screen3() {
                     {/* Option 2: Import Private Key */}
                     <TouchableOpacity
                         activeOpacity={0.7}
-                        className="flex-row items-center bg-[#1e1e30] py-4 px-5 rounded-2xl mb-3"
+                        className="flex-row items-center bg-[#1e1e30] py-4 px-5 rounded-2xl"
                         onPress={() => {
                             closeSheet();
+                            router.push("/(onboarding)/private-key-import");
                         }}
                     >
                         <MaterialCommunityIcons
@@ -259,31 +261,7 @@ export default function Screen3() {
                         />
                     </TouchableOpacity>
 
-                    {/* Option 3: Connect Hardware Wallet */}
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        className="flex-row items-center bg-[#1e1e30] py-4 px-5 rounded-2xl"
-                        onPress={() => {
-                            closeSheet();
-                        }}
-                    >
-                        <MaterialCommunityIcons
-                            name="usb-flash-drive-outline"
-                            size={20}
-                            color="white"
-                        />
-                        <Text
-                            className="text-white text-lg ml-4 flex-1"
-                            style={{ fontFamily: "SNPro-SemiBold" }}
-                        >
-                            Connect Hardware Wallet
-                        </Text>
-                        <Ionicons
-                            name="chevron-forward"
-                            size={18}
-                            color="#666"
-                        />
-                    </TouchableOpacity>
+
                 </Animated.View>
             </Modal>
         </SafeAreaView>

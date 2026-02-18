@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -6,31 +6,33 @@ import {
     Pressable,
     Alert,
     ScrollView,
+    ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Clipboard from "expo-clipboard";
+import { walletManager } from "../../src/lib/wallet";
 
-const WORD_LIST = [
-    "hidden", "club", "steak", "task", "upon", "road",
-    "flag", "parade", "raw", "decade", "farm", "soup",
-    "ocean", "brave", "pulse", "drift", "echo", "frost",
-    "glow", "haze", "iris", "jade", "knot", "lamp",
-    "mist", "nest", "opal", "pine", "reef", "silk",
-    "tide", "veil", "wave", "zeal", "arch", "bloom",
-    "cord", "dawn", "edge", "fern", "grid", "husk",
-    "isle", "jump", "kelp", "lure", "mesa", "nova",
-];
-
-function getRandomWords(count: number): string[] {
-    const shuffled = [...WORD_LIST].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
-}
-
-export default function Screen4() {
-    const words = useMemo(() => getRandomWords(12), []);
+export default function RecoveryPhraseScreen() {
+    const [words, setWords] = useState<string[]>([]);
+    const [address, setAddress] = useState("");
     const [copied, setCopied] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Generate a real wallet on mount
+        try {
+            const { mnemonic, account } = walletManager.createWallet();
+            setWords(mnemonic.split(" "));
+            setAddress(account.shortAddress);
+        } catch (e) {
+            Alert.alert("Error", "Failed to generate wallet. Please try again.");
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     const handleCopy = async () => {
         await Clipboard.setStringAsync(words.join(" "));
@@ -51,6 +53,20 @@ export default function Screen4() {
             ]
         );
     };
+
+    if (loading) {
+        return (
+            <SafeAreaView className="flex-1 bg-[#0a0a14] items-center justify-center">
+                <ActivityIndicator size="large" color="#a78bfa" />
+                <Text
+                    className="text-gray-400 mt-4"
+                    style={{ fontFamily: "SNPro-Regular" }}
+                >
+                    Generating your wallet...
+                </Text>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-[#0a0a14]">
@@ -80,14 +96,7 @@ export default function Screen4() {
                     />
                 </View>
 
-                <Pressable className="p-2">
-                    <Text
-                        className="text-blue-400 text-base"
-                        style={{ fontFamily: "SNPro-SemiBold" }}
-                    >
-                        Next
-                    </Text>
-                </Pressable>
+                <View className="p-2" />
             </View>
 
             <ScrollView
@@ -102,12 +111,24 @@ export default function Screen4() {
                     Recovery Phrase
                 </Text>
                 <Text
-                    className="text-sm text-gray-400 text-center mb-8 px-4"
+                    className="text-sm text-gray-400 text-center mb-2 px-4"
                     style={{ fontFamily: "SNPro-Regular" }}
                 >
                     This is the only way you will be able to recover your
                     account. Please store it somewhere safe!
                 </Text>
+
+                {/* Wallet address badge */}
+                <View className="items-center mb-6">
+                    <View className="bg-[#1e1e30] px-4 py-1.5 rounded-full">
+                        <Text
+                            className="text-blue-400 text-xs"
+                            style={{ fontFamily: "SNPro-SemiBold" }}
+                        >
+                            🔑 {address}
+                        </Text>
+                    </View>
+                </View>
 
                 {/* Word Grid — 2 columns, 6 rows */}
                 <View className="gap-3">
