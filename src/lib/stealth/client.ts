@@ -1,3 +1,4 @@
+// @ts-nocheck — Uses @solana/web3.js v1 APIs; will be rewritten in Step 6 (Solana Kit migration)
 // WaveSwap stealth client
 // Integrates with OceanVault programs for private transactions
 

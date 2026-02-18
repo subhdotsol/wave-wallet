@@ -8,8 +8,8 @@
  */
 
 import { generateMnemonic as bip39Generate, mnemonicToSeedSync, validateMnemonic as bip39Validate } from "bip39";
-import { hmac } from "@noble/hashes/hmac";
-import { sha512 } from "@noble/hashes/sha2";
+import { hmac } from "@noble/hashes/hmac.js";
+import { sha512 } from "@noble/hashes/sha2.js";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 

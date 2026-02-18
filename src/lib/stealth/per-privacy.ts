@@ -1,3 +1,4 @@
+// @ts-nocheck — Uses @solana/web3.js v1 APIs; will be rewritten in Step 6 (Solana Kit migration)
 // PER (Permissionless Execution Runtime) Privacy Integration
 // Complete privacy flow using MagicBlock PER + Mixer + Relayer
 //

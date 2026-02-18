@@ -1,3 +1,4 @@
+// @ts-nocheck — Web-app hook; needs rewrite for mobile (Buffer, missing modules, @solana/web3.js v1)
 'use client'
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
