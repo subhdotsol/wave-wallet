@@ -83,6 +83,15 @@ export const walletManager = {
         return _activeIndex;
     },
 
+    /** Get the base58-encoded private key for an account */
+    getPrivateKeyBase58(index: number): string {
+        if (index < 0 || index >= _accounts.length) {
+            throw new Error(`Invalid account index: ${index}`);
+        }
+        const { default: bs58 } = require("bs58");
+        return bs58.encode(_accounts[index].keypair.secretKey);
+    },
+
     // ── Create ──────────────────────────────────────────────────────
 
     /**

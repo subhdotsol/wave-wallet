@@ -200,19 +200,27 @@ export default function EditAccount() {
                             rightText={hasMnemonic ? "Recovery Phrase 1" : "N/A"}
                         />
                         <MenuDivider />
-                        <MenuItem label="Show Recovery Phrase" />
+                        <MenuItem
+                            label="Show Recovery Phrase"
+                            onPress={() => router.push("/(wallet)/show-recovery-phrase")}
+                        />
                         <MenuDivider />
-                        <MenuItem label="Show Private Key" />
+                        <MenuItem
+                            label="Show Private Key"
+                            onPress={() => router.push(`/(wallet)/show-private-key?index=${accountIndex}`)}
+                        />
                     </MenuSection>
 
                     {/* Remove Account */}
-                    <MenuSection>
-                        <MenuItem
-                            label="Remove Account"
-                            destructive
-                            onPress={handleRemove}
-                        />
-                    </MenuSection>
+                    {accounts.length > 1 && (
+                        <MenuSection>
+                            <MenuItem
+                                label="Remove Account"
+                                destructive
+                                onPress={handleRemove}
+                            />
+                        </MenuSection>
+                    )}
                 </View>
 
                 {/* Bottom spacer */}
