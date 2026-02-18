@@ -1,8 +1,9 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { walletManager } from "../../src/lib/wallet";
+import { rpc } from "../../src/lib/solana/rpc";
 
 // ─── Shared Components ──────────────────────────────────────────────
 import {
@@ -58,6 +59,11 @@ export default function Home() {
     const [balanceVisible, setBalanceVisible] = useState(true);
     const router = useRouter();
     const activeAccount = walletManager.getActiveAccount();
+
+    // ⚠️ TEMP: Remove after testing — verifies Solana RPC connectivity
+    useEffect(() => {
+        rpc.getSlot().send().then((slot) => console.log("✅ Solana devnet connected. Current slot:", Number(slot))).catch((err) => console.error("❌ Solana connection failed:", err.message));
+    }, []);
 
     return (
         <SafeAreaView className="flex-1 bg-[#121212]">
