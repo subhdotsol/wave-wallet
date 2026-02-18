@@ -2,61 +2,17 @@ import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import Svg, { Path, Circle } from "react-native-svg";
+import Feather from "@expo/vector-icons/Feather";
 import { walletManager, type Account } from "../../src/lib/wallet";
 
-// ─── Icons ──────────────────────────────────────────────────────────
-
-function CloseIcon() {
-    return (
-        <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-            <Path d="M18 6L6 18M6 6l12 12" stroke="#fff" strokeWidth={2} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-function ProfileIcon() {
-    return (
-        <Svg width={28} height={28} viewBox="0 0 24 24" fill="none">
-            <Circle cx={12} cy={8} r={4} stroke="#c8b2ff" strokeWidth={1.8} />
-            <Path d="M5 20c0-3.3 2.7-6 7-6s7 2.7 7 6" stroke="#c8b2ff" strokeWidth={1.8} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-function SettingsIcon() {
-    return (
-        <Svg width={28} height={28} viewBox="0 0 24 24" fill="none">
-            <Circle cx={12} cy={12} r={3} stroke="#fff" strokeWidth={1.8} />
-            <Path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-function CheckBadge() {
-    return (
-        <Svg width={18} height={18} viewBox="0 0 18 18" fill="none">
-            <Circle cx={9} cy={9} r={8} fill="#7c5fe3" />
-            <Path d="M5.5 9l2.5 2.5 4.5-4.5" stroke="white" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-    );
-}
-
-function PlusIcon() {
-    return (
-        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-            <Path d="M12 5v14M5 12h14" stroke="#0e0e1a" strokeWidth={2.5} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-function PencilIcon() {
-    return (
-        <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-            <Path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="#888" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-    );
-}
+// ─── Shared Components ──────────────────────────────────────────────
+import {
+    CloseIcon,
+    ProfileIcon,
+    PencilIcon,
+    PlusIcon,
+    VerifiedBadge,
+} from "../../src/components/icons";
 
 // ─── Main Component ─────────────────────────────────────────────────
 
@@ -104,10 +60,10 @@ export default function ProfileDrawer() {
                         </View>
                         {/* Name + Address */}
                         <View>
-                            <Text className="text-white text-lg" style={{ fontFamily: "SNPro-Bold" }}>
+                            <Text className="text-white text-lg" style={{ fontFamily: "Roboto-Bold" }}>
                                 {activeAccount?.name ?? "Wave Wallet"}
                             </Text>
-                            <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "SNPro-Regular" }}>
+                            <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "Roboto-Regular" }}>
                                 {activeAccount?.shortAddress ?? "No wallet"}
                             </Text>
                         </View>
@@ -125,7 +81,7 @@ export default function ProfileDrawer() {
                         className="flex-1 bg-[#1e1e30] rounded-[14px] py-4 items-center gap-1.5 border border-[#2a2a3e]"
                     >
                         <ProfileIcon />
-                        <Text className="text-white text-[13px]" style={{ fontFamily: "SNPro-Medium" }}>Profile</Text>
+                        <Text className="text-white text-[13px]" style={{ fontFamily: "Roboto-Medium" }}>Profile</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -133,14 +89,14 @@ export default function ProfileDrawer() {
                         activeOpacity={0.7}
                         className="flex-1 bg-[#1e1e30] rounded-[14px] py-4 items-center gap-1.5 border border-[#2a2a3e]"
                     >
-                        <SettingsIcon />
-                        <Text className="text-white text-[13px]" style={{ fontFamily: "SNPro-Medium" }}>Settings</Text>
+                        <Feather name="settings" size={28} color="#fff" />
+                        <Text className="text-white text-[13px]" style={{ fontFamily: "Roboto-Medium" }}>Settings</Text>
                     </TouchableOpacity>
                 </View>
 
                 {/* Your Accounts */}
                 <View className="px-5">
-                    <Text className="text-white text-xl mb-3.5" style={{ fontFamily: "SNPro-Bold" }}>
+                    <Text className="text-white text-xl mb-3.5" style={{ fontFamily: "Roboto-Bold" }}>
                         Your Accounts
                     </Text>
 
@@ -154,27 +110,27 @@ export default function ProfileDrawer() {
                                 className="flex-row items-center rounded-[14px] p-4 mb-2.5 border"
                                 style={{
                                     backgroundColor: isActive ? "#1e1e30" : "#161622",
-                                    borderColor: isActive ? "#7c5fe3" : "#2a2a3e",
+                                    borderColor: isActive ? "#3b82f6" : "#2a2a3e",
                                 }}
                             >
                                 {/* Account Badge */}
                                 <View className="w-11 h-11 rounded-full bg-[#2a2a3e] justify-center items-center relative">
-                                    <Text className="text-white text-sm" style={{ fontFamily: "SNPro-Bold" }}>
+                                    <Text className="text-white text-sm" style={{ fontFamily: "Roboto-Bold" }}>
                                         A{idx + 1}
                                     </Text>
                                     {isActive && (
                                         <View className="absolute -bottom-0.5 -right-0.5">
-                                            <CheckBadge />
+                                            <VerifiedBadge size={18} />
                                         </View>
                                     )}
                                 </View>
 
                                 {/* Account Info */}
                                 <View className="flex-1 ml-3">
-                                    <Text className="text-white text-base" style={{ fontFamily: "SNPro-SemiBold" }}>
+                                    <Text className="text-white text-base" style={{ fontFamily: "Roboto-Bold" }}>
                                         {acct.name}
                                     </Text>
-                                    <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "SNPro-Regular" }}>
+                                    <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "Roboto-Regular" }}>
                                         {acct.shortAddress}
                                     </Text>
                                 </View>
@@ -196,7 +152,7 @@ export default function ProfileDrawer() {
 
                     {accounts.length === 0 && (
                         <View className="bg-[#1e1e30] rounded-[14px] p-5 items-center border border-[#2a2a3e]">
-                            <Text className="text-[#888] text-base" style={{ fontFamily: "SNPro-Regular" }}>
+                            <Text className="text-[#888] text-base" style={{ fontFamily: "Roboto-Regular" }}>
                                 No accounts yet
                             </Text>
                         </View>
@@ -211,14 +167,14 @@ export default function ProfileDrawer() {
                     activeOpacity={0.7}
                     className="rounded-2xl py-4 flex-row items-center justify-center gap-2"
                     style={{
-                        backgroundColor: hasMnemonic ? "#c8b2ff" : "#2a2a3e",
+                        backgroundColor: hasMnemonic ? "#3b82f6" : "#2a2a3e",
                     }}
                 >
-                    <PlusIcon />
+                    <PlusIcon size={18} color={hasMnemonic ? "#0e0e1a" : "#555"} />
                     <Text
                         className="text-base"
                         style={{
-                            fontFamily: "SNPro-SemiBold",
+                            fontFamily: "Roboto-Bold",
                             color: hasMnemonic ? "#0e0e1a" : "#555",
                         }}
                     >

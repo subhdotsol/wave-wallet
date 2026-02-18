@@ -1,177 +1,26 @@
 import { View, Text, TouchableOpacity, ScrollView, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import Svg, { Path, Circle, Rect, Line, Polyline } from "react-native-svg";
 
-// ─── Icons ──────────────────────────────────────────────────────────
+// ─── Shared Components ──────────────────────────────────────────────
+import {
+    CloseIcon,
+    SearchIcon,
+    ChevronRightIcon,
+    ManageAccountsIcon,
+    PreferencesIcon,
+    SecurityIcon,
+    GlobeIcon,
+    AddressBookIcon,
+    ConnectedAppsIcon,
+    DevSettingsIcon,
+    HelpIcon,
+    HeartIcon,
+    ShareIcon,
+    AboutIcon,
+} from "../../src/components/icons";
 
-function CloseIcon() {
-    return (
-        <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-            <Path d="M18 6L6 18M6 6l12 12" stroke="#fff" strokeWidth={2} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-function SearchIcon() {
-    return (
-        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-            <Circle cx={11} cy={11} r={7} stroke="#666" strokeWidth={1.8} />
-            <Path d="M16 16l4 4" stroke="#666" strokeWidth={1.8} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-function ChevronRightIcon({ color = "#666" }: { color?: string }) {
-    return (
-        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-            <Path d="M9 18l6-6-6-6" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-    );
-}
-
-function ManageAccountsIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Circle cx={9} cy={7} r={4} stroke="#c8b2ff" strokeWidth={1.6} />
-            <Path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2" stroke="#c8b2ff" strokeWidth={1.6} />
-            <Path d="M19 8v6M22 11h-6" stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-function PreferencesIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Line x1={4} y1={6} x2={4} y2={18} stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" />
-            <Line x1={12} y1={6} x2={12} y2={18} stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" />
-            <Line x1={20} y1={6} x2={20} y2={18} stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" />
-            <Circle cx={4} cy={10} r={2} fill="#0e0e1a" stroke="#c8b2ff" strokeWidth={1.6} />
-            <Circle cx={12} cy={15} r={2} fill="#0e0e1a" stroke="#c8b2ff" strokeWidth={1.6} />
-            <Circle cx={20} cy={9} r={2} fill="#0e0e1a" stroke="#c8b2ff" strokeWidth={1.6} />
-        </Svg>
-    );
-}
-
-function SecurityIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Path d="M12 2l8 4v6c0 5.5-3.8 10-8 11.5C7.8 22 4 17.5 4 12V6l8-4z" stroke="#c8b2ff" strokeWidth={1.6} strokeLinejoin="round" />
-        </Svg>
-    );
-}
-
-function GlobeIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Circle cx={12} cy={12} r={10} stroke="#c8b2ff" strokeWidth={1.6} />
-            <Path d="M2 12h20M12 2a15 15 0 014 10 15 15 0 01-4 10 15 15 0 01-4-10A15 15 0 0112 2z" stroke="#c8b2ff" strokeWidth={1.6} />
-        </Svg>
-    );
-}
-
-function AddressBookIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Circle cx={12} cy={10} r={3} stroke="#c8b2ff" strokeWidth={1.6} />
-            <Path d="M7 20c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" />
-            <Rect x={3} y={3} width={18} height={18} rx={3} stroke="#c8b2ff" strokeWidth={1.6} />
-        </Svg>
-    );
-}
-
-function ConnectedAppsIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Circle cx={12} cy={12} r={3} stroke="#c8b2ff" strokeWidth={1.6} />
-            <Path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-function DevSettingsIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Polyline points="16,18 22,12 16,6" stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
-            <Polyline points="8,6 2,12 8,18" stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-    );
-}
-
-function HelpIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Circle cx={12} cy={12} r={10} stroke="#c8b2ff" strokeWidth={1.6} />
-            <Path d="M9 9a3 3 0 015.12 2.13c0 2-3 2.5-3 2.5" stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" />
-            <Circle cx={12} cy={17} r={0.5} fill="#c8b2ff" />
-        </Svg>
-    );
-}
-
-function HeartIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="#c8b2ff" strokeWidth={1.6} />
-        </Svg>
-    );
-}
-
-function ShareIcon() {
-    return (
-        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-            <Circle cx={18} cy={5} r={3} stroke="#666" strokeWidth={1.6} />
-            <Circle cx={6} cy={12} r={3} stroke="#666" strokeWidth={1.6} />
-            <Circle cx={18} cy={19} r={3} stroke="#666" strokeWidth={1.6} />
-            <Path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="#666" strokeWidth={1.6} />
-        </Svg>
-    );
-}
-
-function AboutIcon() {
-    return (
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Circle cx={12} cy={12} r={10} stroke="#c8b2ff" strokeWidth={1.6} />
-            <Path d="M12 8v4M12 16h.01" stroke="#c8b2ff" strokeWidth={1.6} strokeLinecap="round" />
-        </Svg>
-    );
-}
-
-// ─── Menu Item Component ────────────────────────────────────────────
-
-function MenuItem({ icon, label, rightText, rightIcon, onPress }: {
-    icon: React.ReactNode;
-    label: string;
-    rightText?: string;
-    rightIcon?: React.ReactNode;
-    onPress?: () => void;
-}) {
-    return (
-        <TouchableOpacity
-            onPress={onPress}
-            activeOpacity={0.7}
-            className="flex-row items-center py-4 px-4"
-        >
-            <View className="mr-3.5">{icon}</View>
-            <Text className="text-white text-[15px] flex-1" style={{ fontFamily: "SNPro-Medium" }}>{label}</Text>
-            {rightText && (
-                <Text className="text-[#888] text-sm mr-2" style={{ fontFamily: "SNPro-Regular" }}>{rightText}</Text>
-            )}
-            {rightIcon || <ChevronRightIcon />}
-        </TouchableOpacity>
-    );
-}
-
-function MenuSection({ children }: { children: React.ReactNode }) {
-    return (
-        <View className="bg-[#161625] rounded-2xl mb-3 border border-[#1e1e30] overflow-hidden">
-            {children}
-        </View>
-    );
-}
-
-function MenuDivider() {
-    return <View className="h-px bg-[#1e1e30] ml-[52px]" />;
-}
+import { MenuSection, MenuDivider, MenuItem } from "../../src/components/ui";
 
 // ─── Main Component ─────────────────────────────────────────────────
 
@@ -182,7 +31,7 @@ export default function Settings() {
         <SafeAreaView className="flex-1 bg-[#0e0e1a]">
             {/* Header */}
             <View className="flex-row justify-between items-center px-5 pt-2 pb-4">
-                <Text className="text-white text-[28px]" style={{ fontFamily: "SNPro-Bold" }}>Settings</Text>
+                <Text className="text-white text-[28px]" style={{ fontFamily: "Roboto-Bold" }}>Settings</Text>
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
                     <CloseIcon />
                 </TouchableOpacity>
@@ -191,12 +40,12 @@ export default function Settings() {
             <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
                 {/* Search Bar */}
                 <View className="flex-row items-center bg-[#1e1e30] rounded-xl px-3.5 py-3 mb-4 gap-2.5">
-                    <SearchIcon />
+                    <SearchIcon size={18} color="#666" />
                     <TextInput
                         placeholder="Search"
                         placeholderTextColor="#666"
                         className="flex-1 text-white text-[15px] p-0"
-                        style={{ fontFamily: "SNPro-Regular" }}
+                        style={{ fontFamily: "Roboto-Regular" }}
                     />
                 </View>
 
@@ -210,7 +59,7 @@ export default function Settings() {
                         <View className="w-10 h-10 rounded-full bg-[#d4e157] justify-center items-center mr-3">
                             <Text className="text-lg">🌊</Text>
                         </View>
-                        <Text className="text-white text-base flex-1" style={{ fontFamily: "SNPro-SemiBold" }}>@wavewallet</Text>
+                        <Text className="text-white text-base flex-1" style={{ fontFamily: "Roboto-Bold" }}>@wavewallet</Text>
                         <ChevronRightIcon />
                     </TouchableOpacity>
                 </MenuSection>
@@ -218,18 +67,18 @@ export default function Settings() {
                 {/* Account Management Group */}
                 <MenuSection>
                     <MenuItem icon={<ManageAccountsIcon />} label="Manage Accounts" rightText="2" />
-                    <MenuDivider />
+                    <MenuDivider inset={52} />
                     <MenuItem icon={<PreferencesIcon />} label="Preferences" />
-                    <MenuDivider />
+                    <MenuDivider inset={52} />
                     <MenuItem icon={<SecurityIcon />} label="Security & Privacy" />
                 </MenuSection>
 
                 {/* Network & Apps Group */}
                 <MenuSection>
                     <MenuItem icon={<GlobeIcon />} label="Active Networks" rightText="All" />
-                    <MenuDivider />
+                    <MenuDivider inset={52} />
                     <MenuItem icon={<AddressBookIcon />} label="Address Book" />
-                    <MenuDivider />
+                    <MenuDivider inset={52} />
                     <MenuItem icon={<ConnectedAppsIcon />} label="Connected Apps" />
                 </MenuSection>
 
@@ -241,9 +90,9 @@ export default function Settings() {
                 {/* Support & About */}
                 <MenuSection>
                     <MenuItem icon={<HelpIcon />} label="Help & Support" />
-                    <MenuDivider />
+                    <MenuDivider inset={52} />
                     <MenuItem icon={<HeartIcon />} label="Invite your friends" rightIcon={<ShareIcon />} />
-                    <MenuDivider />
+                    <MenuDivider inset={52} />
                     <MenuItem icon={<AboutIcon />} label="About Phantom" />
                 </MenuSection>
 

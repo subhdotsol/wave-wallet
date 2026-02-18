@@ -10,6 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 SplashScreen.preventAutoHideAsync();
+import { Roboto_400Regular, Roboto_500Medium, Roboto_700Bold } from "@expo-google-fonts/roboto";
 
 export default function RootLayout() {
     const [fontsLoaded] = useFonts({
@@ -19,6 +20,9 @@ export default function RootLayout() {
         "SNPro-Medium": require("../assets/fonts/SNPro-Medium.otf"),
         "SNPro-SemiBold": require("../assets/fonts/SNPro-SemiBold.otf"),
         "SNPro-Bold": require("../assets/fonts/SNPro-Bold.otf"),
+        "Roboto-Regular": Roboto_400Regular,
+        "Roboto-Medium": Roboto_500Medium,
+        "Roboto-Bold": Roboto_700Bold,
     });
 
     useEffect(() => {
