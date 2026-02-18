@@ -33,7 +33,7 @@ export default function PrivateKeyImportScreen() {
 
         setLoading(true);
         try {
-            walletManager.importFromPrivateKey(trimmed);
+            await walletManager.importFromPrivateKey(trimmed);
             router.replace("/(main)");
         } catch (e: any) {
             setError(

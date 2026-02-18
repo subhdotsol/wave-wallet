@@ -5,9 +5,10 @@
  *
  * Usage:
  *   import { walletManager, shortenAddress } from "@/lib/wallet";
+ *   import { useWalletStore } from "@/lib/wallet"; // reactive hook
  */
 
-export { walletManager } from "./wallet-manager";
+export { walletManager, useWalletStore } from "./wallet-manager";
 export type { Account } from "./wallet-manager";
 
 export {

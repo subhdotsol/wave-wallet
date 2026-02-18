@@ -1,16 +1,17 @@
 import "../src/polyfills"; // ← MUST be the very first import (Buffer, crypto, URL polyfills)
 import "../global.css";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useFonts } from "expo-font";
 import {
     Lato_400Regular,
     Lato_700Bold,
 } from "@expo-google-fonts/lato";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 SplashScreen.preventAutoHideAsync();
 import { Roboto_400Regular, Roboto_500Medium, Roboto_700Bold } from "@expo-google-fonts/roboto";
+import { useWalletStore } from "../src/store/wallet-store";
 
 export default function RootLayout() {
     const [fontsLoaded] = useFonts({
@@ -25,13 +26,41 @@ export default function RootLayout() {
         "Roboto-Bold": Roboto_700Bold,
     });
 
+    // ── Wallet hydration ─────────────────────────────────────────────
+    const isHydrated = useWalletStore((s) => s.isHydrated);
+    const accounts = useWalletStore((s) => s.accounts);
+    const hydrate = useWalletStore((s) => s.hydrate);
+
     useEffect(() => {
-        if (fontsLoaded) {
+        hydrate();
+    }, []);
+
+    // ── Hide splash once everything is ready ─────────────────────────
+    const isReady = fontsLoaded && isHydrated;
+
+    useEffect(() => {
+        if (isReady) {
             SplashScreen.hideAsync();
         }
-    }, [fontsLoaded]);
+    }, [isReady]);
 
-    if (!fontsLoaded) return null;
+    // ── Route guard: only on initial hydration ───────────────────────
+    const router = useRouter();
+    const hasRedirected = useRef(false);
+
+    useEffect(() => {
+        if (!isReady || hasRedirected.current) return;
+        hasRedirected.current = true;
+
+        const hasWallet = accounts.length > 0;
+
+        if (hasWallet) {
+            router.replace("/(main)");
+        }
+        // If no wallet, we're already on (onboarding) via initialRouteName
+    }, [isReady]);
+
+    if (!isReady) return null;
 
     return (
         <Stack

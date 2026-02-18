@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, ScrollView, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { walletManager } from "../../src/lib/wallet";
 
 // ─── Shared Components ──────────────────────────────────────────────
 import {
@@ -94,6 +95,35 @@ export default function Settings() {
                     <MenuItem icon={<HeartIcon size={24} />} label="Invite your friends" rightIcon={<ShareIcon size={20} />} />
                     <MenuDivider inset={52} />
                     <MenuItem icon={<AboutIcon size={24} />} label="About Phantom" />
+                </MenuSection>
+
+                {/* ⚠️ DEV ONLY — Remove before production */}
+                <MenuSection>
+                    <TouchableOpacity
+                        onPress={() => {
+                            Alert.alert(
+                                "Reset Wallet",
+                                "This will wipe ALL wallet data (AsyncStorage + SecureStore). Are you sure?",
+                                [
+                                    { text: "Cancel", style: "cancel" },
+                                    {
+                                        text: "Reset",
+                                        style: "destructive",
+                                        onPress: async () => {
+                                            await walletManager.reset();
+                                            router.replace("/(onboarding)");
+                                        },
+                                    },
+                                ]
+                            );
+                        }}
+                        activeOpacity={0.7}
+                        className="py-4 items-center"
+                    >
+                        <Text className="text-red-500 text-[16px]" style={{ fontFamily: "Roboto-Bold" }}>
+                            🗑️ DEV: Reset Wallet
+                        </Text>
+                    </TouchableOpacity>
                 </MenuSection>
 
                 {/* Bottom spacer */}

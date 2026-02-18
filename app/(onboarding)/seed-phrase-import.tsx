@@ -40,7 +40,7 @@ export default function SeedPhraseImportScreen() {
 
         setLoading(true);
         try {
-            walletManager.importFromMnemonic(trimmed);
+            await walletManager.importFromMnemonic(trimmed);
             router.replace("/(main)");
         } catch (e: any) {
             setError(e.message ?? "Import failed. Please try again.");

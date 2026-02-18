@@ -22,16 +22,18 @@ export default function RecoveryPhraseScreen() {
 
     useEffect(() => {
         // Generate a real wallet on mount
-        try {
-            const { mnemonic, account } = walletManager.createWallet();
-            setWords(mnemonic.split(" "));
-            setAddress(account.shortAddress);
-        } catch (e) {
-            Alert.alert("Error", "Failed to generate wallet. Please try again.");
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
+        (async () => {
+            try {
+                const { mnemonic, account } = await walletManager.createWallet();
+                setWords(mnemonic.split(" "));
+                setAddress(account.shortAddress);
+            } catch (e) {
+                Alert.alert("Error", "Failed to generate wallet. Please try again.");
+                console.error(e);
+            } finally {
+                setLoading(false);
+            }
+        })();
     }, []);
 
     const handleCopy = async () => {
