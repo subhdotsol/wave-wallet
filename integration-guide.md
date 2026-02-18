@@ -3,6 +3,7 @@
 > **Reference branch:** `feat/wavesend-and-devnet-integration`  
 > **Network:** Solana Devnet  
 > **Purpose:** Port the complete WaveSend (stealth transfer) feature from the web app to the Wave mobile app (React Native / Expo).
+> **Solana SDK:** `@solana/kit` (formerly `@solana/web3.js` v2) — https://github.com/anza-xyz/kit
 
 ---
 
@@ -23,6 +24,8 @@
 13. [Mobile-Specific Adaptations](#13-mobile-specific-adaptations)
 14. [Dependencies](#14-dependencies)
 15. [Step-by-Step Implementation Checklist](#15-step-by-step-implementation-checklist)
+16. [Step-by-Step Integration (Expo + NativeWind)](#16-step-by-step-integration-expo--nativewind)
+17. [Solana Kit Resources](#17-solana-kit-resources)
 
 ---
 
@@ -70,13 +73,13 @@ WaveSend implements **privacy-preserving token transfers** using stealth address
 
 ### Privacy Guarantees
 
-| Property | How Achieved |
-|---|---|
-| **Sender unlinkability** | Funds go through mixer pool; sender never touches output escrow |
+| Property                   | How Achieved                                                                       |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| **Sender unlinkability**   | Funds go through mixer pool; sender never touches output escrow                    |
 | **Receiver unlinkability** | Stealth address derived from X-Wing shared secret; no on-chain link to real wallet |
-| **Post-quantum security** | X-Wing (ML-KEM-768 + X25519) hybrid KEM |
-| **Gasless claiming** | Kora (Solana Foundation) pays L1 TX fees for receiver |
-| **Key isolation** | Private keys kept in Web Worker (web) or secure enclave (mobile) |
+| **Post-quantum security**  | X-Wing (ML-KEM-768 + X25519) hybrid KEM                                            |
+| **Gasless claiming**       | Kora (Solana Foundation) pays L1 TX fees for receiver                              |
+| **Key isolation**          | Private keys kept in Web Worker (web) or secure enclave (mobile)                   |
 
 ---
 
@@ -84,41 +87,41 @@ WaveSend implements **privacy-preserving token transfers** using stealth address
 
 ### Core Hooks (Port to React Native)
 
-| Web File | What It Does | Mobile Equivalent |
-|---|---|---|
-| `apps/web/src/hooks/useWaveSend.ts` | Main send hook — init keys, register, send, claim | `hooks/useWaveSend.ts` |
-| `apps/web/src/hooks/useAutoClaim.ts` | Scan for incoming payments, claim via TEE | `hooks/useAutoClaim.ts` |
-| `apps/web/src/hooks/useWalletAdapter.ts` | Wallet connection adapter | Use mobile wallet SDK |
+| Web File                                 | What It Does                                      | Mobile Equivalent       |
+| ---------------------------------------- | ------------------------------------------------- | ----------------------- |
+| `apps/web/src/hooks/useWaveSend.ts`      | Main send hook — init keys, register, send, claim | `hooks/useWaveSend.ts`  |
+| `apps/web/src/hooks/useAutoClaim.ts`     | Scan for incoming payments, claim via TEE         | `hooks/useAutoClaim.ts` |
+| `apps/web/src/hooks/useWalletAdapter.ts` | Wallet connection adapter                         | Use mobile wallet SDK   |
 
 ### Stealth Library (Core SDK — mostly portable as-is)
 
-| Web File | What It Does | Lines |
-|---|---|---|
-| `apps/web/src/lib/stealth/index.ts` | Re-exports all SDK symbols | 150 |
-| `apps/web/src/lib/stealth/client.ts` | `WaveStealthClient` class — all on-chain ops | 2936 |
-| `apps/web/src/lib/stealth/config.ts` | Program IDs, PDA seeds, constants, Kora config | 535 |
-| `apps/web/src/lib/stealth/crypto.ts` | Stealth key derivation, ECDH, X-Wing, encryption | 375 |
-| `apps/web/src/lib/stealth/types.ts` | TypeScript interfaces | 155 |
-| `apps/web/src/lib/stealth/scanner.ts` | V4 OutputEscrow + DepositRecord scanner | 846 |
-| `apps/web/src/lib/stealth/xwing.ts` | X-Wing KEM (ML-KEM-768 + X25519) | 375~ |
-| `apps/web/src/lib/stealth/stealth-worker.ts` | Web Worker (key isolation) | 471 |
-| `apps/web/src/lib/stealth/stealth-worker-client.ts` | Main thread ↔ Worker bridge | 314 |
-| `apps/web/src/lib/stealth/per-privacy.ts` | PER integration (MagicBlock TEE) | 1690 |
+| Web File                                            | What It Does                                     | Lines |
+| --------------------------------------------------- | ------------------------------------------------ | ----- |
+| `apps/web/src/lib/stealth/index.ts`                 | Re-exports all SDK symbols                       | 150   |
+| `apps/web/src/lib/stealth/client.ts`                | `WaveStealthClient` class — all on-chain ops     | 2936  |
+| `apps/web/src/lib/stealth/config.ts`                | Program IDs, PDA seeds, constants, Kora config   | 535   |
+| `apps/web/src/lib/stealth/crypto.ts`                | Stealth key derivation, ECDH, X-Wing, encryption | 375   |
+| `apps/web/src/lib/stealth/types.ts`                 | TypeScript interfaces                            | 155   |
+| `apps/web/src/lib/stealth/scanner.ts`               | V4 OutputEscrow + DepositRecord scanner          | 846   |
+| `apps/web/src/lib/stealth/xwing.ts`                 | X-Wing KEM (ML-KEM-768 + X25519)                 | 375~  |
+| `apps/web/src/lib/stealth/stealth-worker.ts`        | Web Worker (key isolation)                       | 471   |
+| `apps/web/src/lib/stealth/stealth-worker-client.ts` | Main thread ↔ Worker bridge                      | 314   |
+| `apps/web/src/lib/stealth/per-privacy.ts`           | PER integration (MagicBlock TEE)                 | 1690  |
 
 ### UI Components (Reference for mobile screens)
 
-| Web File | What It Does |
-|---|---|
-| `apps/web/src/components/Send/WaveSend.tsx` | Full send UI with token selection, recipient, amount, status banners |
-| `apps/web/src/components/ui/TransactionToast.tsx` | Toast notifications for send/receive/claim |
+| Web File                                          | What It Does                                                         |
+| ------------------------------------------------- | -------------------------------------------------------------------- |
+| `apps/web/src/components/Send/WaveSend.tsx`       | Full send UI with token selection, recipient, amount, status banners |
+| `apps/web/src/components/ui/TransactionToast.tsx` | Toast notifications for send/receive/claim                           |
 
 ### API Routes (May need mobile backend equivalent)
 
-| Web File | What It Does |
-|---|---|
+| Web File                                            | What It Does                                     |
+| --------------------------------------------------- | ------------------------------------------------ |
 | `apps/web/src/app/api/v1/send-transaction/route.ts` | Server-side raw TX proxy (avoids client timeout) |
-| `apps/web/src/app/api/v1/rpc/` | RPC proxy (hides API keys) |
-| `apps/web/src/app/api/v1/per-rpc/` | MagicBlock PER RPC proxy |
+| `apps/web/src/app/api/v1/rpc/`                      | RPC proxy (hides API keys)                       |
+| `apps/web/src/app/api/v1/per-rpc/`                  | MagicBlock PER RPC proxy                         |
 
 ---
 
@@ -127,41 +130,41 @@ WaveSend implements **privacy-preserving token transfers** using stealth address
 ```typescript
 // OceanVault Program IDs (Devnet) — MUST match deployed programs
 const PROGRAM_IDS = {
-  REGISTRY: "DgoW9MneWt6B3mBZqDf52csXMtJpgqwaHgP46tPs1tWu",  // Stealth key registry
-  STEALTH:  "4jFg8uSh4jWkeoz6itdbsD7GadkTYLwfbyfDeNeB5nFX",  // Stealth transfers + mixer pool
-  DEFI:     "8Xi4D44Xt3DnT6r8LogM4K9CSt3bHtpc1m21nErGawaA",  // Staking
-  BRIDGE:   "AwZHcaizUMSsQC7fNAMbrahK2w3rLYXUDFCK4MvMKz1f",  // Bridge
-  DELEGATION: "DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh",// MagicBlock delegation
-  MAGICBLOCK_ER: "ERdXRZQiAooqHBRQqhr6ZxppjUfuXsgPijBZaZLiZPfL",
-  PERMISSION: "ACLseoPoyC3cBqoUtkbjZ4aDrkurZW86v19pXz2XQnp1",
-};
+  REGISTRY: 'DgoW9MneWt6B3mBZqDf52csXMtJpgqwaHgP46tPs1tWu', // Stealth key registry
+  STEALTH: '4jFg8uSh4jWkeoz6itdbsD7GadkTYLwfbyfDeNeB5nFX', // Stealth transfers + mixer pool
+  DEFI: '8Xi4D44Xt3DnT6r8LogM4K9CSt3bHtpc1m21nErGawaA', // Staking
+  BRIDGE: 'AwZHcaizUMSsQC7fNAMbrahK2w3rLYXUDFCK4MvMKz1f', // Bridge
+  DELEGATION: 'DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh', // MagicBlock delegation
+  MAGICBLOCK_ER: 'ERdXRZQiAooqHBRQqhr6ZxppjUfuXsgPijBZaZLiZPfL',
+  PERMISSION: 'ACLseoPoyC3cBqoUtkbjZ4aDrkurZW86v19pXz2XQnp1',
+}
 
 // Master authority (receives rent from closed accounts)
-const MASTER_AUTHORITY = "DNKKC4uCNE55w66GFENJSEo7PYVSDLnSL62jvHoNeeBU";
+const MASTER_AUTHORITY = 'DNKKC4uCNE55w66GFENJSEo7PYVSDLnSL62jvHoNeeBU'
 
 // Native SOL mint
-const NATIVE_SOL_MINT = "So11111111111111111111111111111111111111112";
+const NATIVE_SOL_MINT = 'So11111111111111111111111111111111111111112'
 
 // Kora gasless config
 const KORA_CONFIG = {
-  RPC_URL: "https://genuine-vibrancy-production.up.railway.app",
+  RPC_URL: 'https://genuine-vibrancy-production.up.railway.app',
   ENABLED: true,
-};
+}
 
 // MagicBlock PER config
 const MAGICBLOCK_PER = {
-  ER_ENDPOINT: "https://devnet-as.magicblock.app",
-  TEE_VALIDATOR: "MAS1Dt9qreoRMQ14YQuhg8UTZMMzDdKhmkZMECCzk57",
-  MAGIC_CONTEXT: "MagicContext1111111111111111111111111111111",
-  MAGIC_PROGRAM: "Magic11111111111111111111111111111111111111",
-};
+  ER_ENDPOINT: 'https://devnet-as.magicblock.app',
+  TEE_VALIDATOR: 'MAS1Dt9qreoRMQ14YQuhg8UTZMMzDdKhmkZMECCzk57',
+  MAGIC_CONTEXT: 'MagicContext1111111111111111111111111111111',
+  MAGIC_PROGRAM: 'Magic11111111111111111111111111111111111111',
+}
 
 // Token mint addresses (Devnet)
 const TOKEN_MINTS = {
-  WAVE:   "6D6DjjiwtWPMCb2tkRVuTDi5esUu2rzHnhpE6z3nyskE",
-  WEALTH: "Diz52amvNsWFWrA8WnwQMVxSL5asMqL8MhZVSBk8TWcz",
-  USDC:   "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
-};
+  WAVE: '6D6DjjiwtWPMCb2tkRVuTDi5esUu2rzHnhpE6z3nyskE',
+  WEALTH: 'Diz52amvNsWFWrA8WnwQMVxSL5asMqL8MhZVSBk8TWcz',
+  USDC: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
+}
 ```
 
 ---
@@ -172,10 +175,10 @@ const TOKEN_MINTS = {
 
 ```json
 {
-  "@noble/curves": "^1.x",        // Ed25519, X25519
-  "@noble/post-quantum": "^0.x",  // ML-KEM-768 (CRYSTALS-Kyber)
-  "@noble/hashes": "^1.x",        // SHA-256, SHA-512
-  "js-sha3": "^0.9.x"             // SHA3-256 (Keccak)
+  "@noble/curves": "^1.x", // Ed25519, X25519
+  "@noble/post-quantum": "^0.x", // ML-KEM-768 (CRYSTALS-Kyber)
+  "@noble/hashes": "^1.x", // SHA-256, SHA-512
+  "js-sha3": "^0.9.x" // SHA3-256 (Keccak)
 }
 ```
 
@@ -281,26 +284,33 @@ On mobile, you **cannot use Web Workers**. Options:
 
 ```typescript
 // lib/stealth-keys.ts (singleton, NOT React state)
-let keys: FullKeySet | null = null;
+let keys: FullKeySet | null = null
 
 export function initializeKeys(signature: Uint8Array): StealthPublicKeys {
   // Wipe old keys if they exist
-  if (keys) wipeAllKeys(keys);
-  
-  keys = deriveKeysFromSignature(signature);
-  
+  if (keys) wipeAllKeys(keys)
+
+  keys = deriveKeysFromSignature(signature)
+
   // Zero the signature
-  signature.fill(0);
-  
+  signature.fill(0)
+
   return {
     spendPubkey: keys.spendPubkey,
     viewPubkey: keys.viewPubkey,
     xwingPubkey: serializeXWingPublicKey(keys.xwingKeys.publicKey),
-  };
+  }
 }
 
-export function getKeys(): FullKeySet | null { return keys; }
-export function wipeKeys(): void { if (keys) { wipeAllKeys(keys); keys = null; } }
+export function getKeys(): FullKeySet | null {
+  return keys
+}
+export function wipeKeys(): void {
+  if (keys) {
+    wipeAllKeys(keys)
+    keys = null
+  }
+}
 ```
 
 ---
@@ -308,6 +318,7 @@ export function wipeKeys(): void { if (keys) { wipeAllKeys(keys); keys = null; }
 ## 6. Registration Flow
 
 ### Purpose
+
 Before a user can **receive** stealth payments, they must register their X-Wing public key on-chain. This is a multi-transaction process because the key is 1216 bytes (too large for a single TX).
 
 ### Steps
@@ -343,16 +354,16 @@ const payerRes = await fetch(KORA_CONFIG.RPC_URL, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getPayerSigner', params: [] }),
-});
-const koraFeePayer = payerRes.result.signer_address; // PublicKey
+})
+const koraFeePayer = payerRes.result.signer_address // PublicKey
 
 // 2. Get blockhash from Kora
 const bhRes = await fetch(KORA_CONFIG.RPC_URL, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getBlockhash', params: [] }),
-});
-const blockhash = bhRes.result.blockhash;
+})
+const blockhash = bhRes.result.blockhash
 
 // 3. Build TXs with Kora as feePayer, user only signs
 // 4. Submit to Kora: signAndSendTransaction(txBase64)
@@ -360,11 +371,12 @@ const submitRes = await fetch(KORA_CONFIG.RPC_URL, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    jsonrpc: '2.0', id: 1,
+    jsonrpc: '2.0',
+    id: 1,
     method: 'signAndSendTransaction',
-    params: [txBase64]
+    params: [txBase64],
   }),
-});
+})
 ```
 
 ### Registry PDA Layout
@@ -395,6 +407,7 @@ NEW format (112 bytes) — discriminator "SIMPREG\0":
 This is the **active, recommended** send method. The sender signs 3 transactions in a single wallet popup.
 
 ### Pre-requisites
+
 - Sender is connected and has initialized stealth keys
 - Recipient is registered (has finalized X-Wing registry on-chain)
 - Sender has sufficient balance
@@ -402,28 +415,29 @@ This is the **active, recommended** send method. The sender signs 3 transactions
 ### Step-by-Step
 
 #### Step 0: Pre-computation
+
 ```typescript
 // 1. Fetch recipient's registry (X-Wing public key)
-const registry = await client.getRegistry(recipientWallet);
-const recipientXWingPk = deserializeXWingPublicKey(registry.xwingPubkey); // 1216 bytes
+const registry = await client.getRegistry(recipientWallet)
+const recipientXWingPk = deserializeXWingPublicKey(registry.xwingPubkey) // 1216 bytes
 
 // 2. X-Wing encapsulate → ciphertext + sharedSecret
-const { ciphertext, sharedSecret } = xwingEncapsulate(recipientXWingPk);
+const { ciphertext, sharedSecret } = xwingEncapsulate(recipientXWingPk)
 // ciphertext: 1120 bytes, sharedSecret: 32 bytes
 
 // 3. Derive stealth pubkey (MUST use SHA-256, NOT SHA3-256!)
-const stealthPubkey = SHA256(sharedSecret + "stealth-derive"); // 32 bytes
+const stealthPubkey = SHA256(sharedSecret + 'stealth-derive') // 32 bytes
 
 // 4. Extract ephemeral pubkey and view tag
-const ephemeralPubkey = ciphertext.slice(-32); // last 32 bytes
-const viewTag = sharedSecret[0]; // 1 byte
+const ephemeralPubkey = ciphertext.slice(-32) // last 32 bytes
+const viewTag = sharedSecret[0] // 1 byte
 
 // 5. Encrypt destination wallet with AES-GCM
-const encryptedDestination = await encryptDestinationWallet(recipientWallet.toBytes(), sharedSecret);
+const encryptedDestination = await encryptDestinationWallet(recipientWallet.toBytes(), sharedSecret)
 // 48 bytes (nonce + ciphertext + tag packed)
 
 // 6. Get next sequential ID from PER pool
-const seqId = await client.getNextSeqId(); // bigint
+const seqId = await client.getNextSeqId() // bigint
 ```
 
 #### Step 1: Derive All PDAs (seqId-based)
@@ -431,26 +445,32 @@ const seqId = await client.getNextSeqId(); // bigint
 ```typescript
 // PER mixer pool PDA (singleton)
 const [perMixerPoolPda, poolBump] = findProgramAddressSync(
-  ["per-mixer-pool-oceanvault"], STEALTH_PROGRAM
-);
+  ['per-mixer-pool-oceanvault'],
+  STEALTH_PROGRAM
+)
 
 // Deposit record PDA
-const seqIdBuf = Buffer.alloc(8); // LE encoding of seqId
-writeBigUint64LE(seqIdBuf, seqId, 0);
+const seqIdBuf = Buffer.alloc(8) // LE encoding of seqId
+writeBigUint64LE(seqIdBuf, seqId, 0)
 const [depositRecordPda, recordBump] = findProgramAddressSync(
-  ["deposit-seq", seqIdBuf], STEALTH_PROGRAM
-);
+  ['deposit-seq', seqIdBuf],
+  STEALTH_PROGRAM
+)
 
 // Input escrow PDA
-const [escrowPda, escrowBump] = findProgramAddressSync(
-  ["input-seq", seqIdBuf], STEALTH_PROGRAM
-);
+const [escrowPda, escrowBump] = findProgramAddressSync(['input-seq', seqIdBuf], STEALTH_PROGRAM)
 
 // Delegation PDAs (for MagicBlock PER delegation)
-const [escrowBuffer] = findProgramAddressSync(["buffer", escrowPda], STEALTH_PROGRAM);
-const [escrowDelegationRecord] = findProgramAddressSync(["delegation", escrowPda], DELEGATION_PROGRAM);
-const [escrowDelegationMetadata] = findProgramAddressSync(["delegation-metadata", escrowPda], DELEGATION_PROGRAM);
-const [permissionPda] = findProgramAddressSync(["permission:", escrowPda], PERMISSION_PROGRAM);
+const [escrowBuffer] = findProgramAddressSync(['buffer', escrowPda], STEALTH_PROGRAM)
+const [escrowDelegationRecord] = findProgramAddressSync(
+  ['delegation', escrowPda],
+  DELEGATION_PROGRAM
+)
+const [escrowDelegationMetadata] = findProgramAddressSync(
+  ['delegation-metadata', escrowPda],
+  DELEGATION_PROGRAM
+)
+const [permissionPda] = findProgramAddressSync(['permission:', escrowPda], PERMISSION_PROGRAM)
 // ... more delegation PDAs (see config.ts for full list)
 ```
 
@@ -498,7 +518,7 @@ Accounts (19!):
   [0]  payer (signer, writable) = wallet
   [1]  pool (writable) = perMixerPoolPda
   [2]  deposit_record (writable) = depositRecordPda
-  [3]  escrow (writable) = escrowPda  
+  [3]  escrow (writable) = escrowPda
   [4]  escrow_buffer (writable) = escrowBuffer
   [5]  escrow_delegation_record (writable)
   [6]  escrow_delegation_metadata (writable)
@@ -528,13 +548,14 @@ Data layout:
 
 ```typescript
 // Batch sign ALL TXs with ONE wallet popup
-const allTxs = [tx1, tx2_chunk1, tx2_chunk2, tx3];
-const signedTxs = await wallet.signAllTransactions(allTxs);
+const allTxs = [tx1, tx2_chunk1, tx2_chunk2, tx3]
+const signedTxs = await wallet.signAllTransactions(allTxs)
 
 // Submit sequentially (order matters!)
 for (const signedTx of signedTxs) {
-  const sig = await connection.sendRawTransaction(signedTx.serialize());
-  await confirmTransactionPolling(connection, sig);
+  const base64Tx = Buffer.from(signedTx.serialize()).toString('base64')
+  const sig = await rpc.sendTransaction(base64Tx, { encoding: 'base64' }).send()
+  await confirmTransactionPolling(rpc, sig)
 }
 ```
 
@@ -546,7 +567,7 @@ await fetch(`${window.location.origin}/api/v1/crank`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ seq_id: seqId.toString() }),
-});
+})
 ```
 
 The crank handles: `REGISTER_DEPOSIT → INPUT_TO_POOL → PREPARE_OUTPUT → POOL_TO_ESCROW`
@@ -604,55 +625,55 @@ Phase 2: Fetch all OutputEscrow accounts (91 bytes each)
 ### Claim Flow (TEE Privacy — RECOMMENDED)
 
 ```typescript
+import {
+  address,
+  type Address,
+  createTransactionMessage,
+  setTransactionMessageFeePayer,
+  appendTransactionMessageInstruction,
+  type IInstruction,
+} from '@solana/kit'
+
 // 1. Verify locally
-const derivedStealth = deriveStealthPubkeyFromSharedSecret(sharedSecret);
-assert(derivedStealth === escrow.stealthPubkey);
+const derivedStealth = deriveStealthPubkeyFromSharedSecret(sharedSecret)
+assert(derivedStealth === escrow.stealthPubkey)
 
 // 2. Check if already verified on L1 (skip CLAIM step)
-const escrowInfo = await connection.getAccountInfo(escrowPda);
-if (escrowInfo.data[81] === 1 && escrowInfo.data[82] !== 1) {
+const { value: escrowInfo } = await rpc.getAccountInfo(escrowPda, { encoding: 'base64' }).send()
+const escrowData = Buffer.from(escrowInfo.data[0], 'base64')
+if (escrowData[81] === 1 && escrowData[82] !== 1) {
   // Already verified, skip to WITHDRAW
-  goto step4;
+  goto step4
 }
 
 // 3. CLAIM_ESCROW_V4 (0x27) on PER
-const claimData = Buffer.alloc(65);
-claimData[0] = 0x27; // CLAIM_ESCROW_V4
-Buffer.from(sharedSecret).copy(claimData, 1);   // sharedSecret (32 bytes)
-Buffer.from(destination.toBytes()).copy(claimData, 33); // destination wallet (32 bytes)
+const claimData = Buffer.alloc(65)
+claimData[0] = 0x27 // CLAIM_ESCROW_V4
+Buffer.from(sharedSecret).copy(claimData, 1) // sharedSecret (32 bytes)
+Buffer.from(destination, 'base58').copy(claimData, 33) // destination wallet (32 bytes)
 
-const claimTx = new Transaction();
-claimTx.add(new TransactionInstruction({
-  keys: [
-    { pubkey: payer, isSigner: true, isWritable: true },
-    { pubkey: escrowPda, isSigner: false, isWritable: true },
-    { pubkey: MAGIC_CONTEXT, isSigner: false, isWritable: true },
-    { pubkey: MAGIC_PROGRAM, isSigner: false, isWritable: false },
+const claimIx: IInstruction = {
+  programAddress: address(STEALTH_PROGRAM),
+  accounts: [
+    { address: payer, role: 3 }, // signer + writable
+    { address: escrowPda, role: 2 }, // writable
+    { address: address(MAGIC_CONTEXT), role: 2 },
+    { address: address(MAGIC_PROGRAM), role: 0 }, // readonly
   ],
-  programId: STEALTH_PROGRAM,
   data: claimData,
-}));
+}
+
+const claimTx = await pipe(
+  createTransactionMessage({ version: 0 }),
+  (tx) => setTransactionMessageFeePayer(payer, tx),
+  (tx) => appendTransactionMessageInstruction(claimIx, tx)
+)
+
 // Submit to MagicBlock PER RPC (not L1!)
-await perConnection.sendRawTransaction(signedTx.serialize());
+const base64ClaimTx = // ... encode transaction
+const sig = await perRpc.sendTransaction(base64ClaimTx, { encoding: 'base64' }).send()
 
 // 4. WITHDRAW_FROM_OUTPUT_ESCROW (0x2F) on L1 — Gasless via Kora
-const withdrawData = Buffer.alloc(33);
-withdrawData[0] = 0x2F;
-Buffer.from(stealthPubkey).copy(withdrawData, 1);
-
-const withdrawTx = new Transaction();
-withdrawTx.add(new TransactionInstruction({
-  keys: [
-    { pubkey: koraFeePayer, isSigner: true, isWritable: false },
-    { pubkey: escrowPda, isSigner: false, isWritable: true },
-    { pubkey: destination, isSigner: false, isWritable: true },
-    { pubkey: MASTER_AUTHORITY, isSigner: false, isWritable: true },
-    { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-    // Optional: XWingCiphertextPda if it exists and is owned by STEALTH program
-  ],
-  programId: STEALTH_PROGRAM,
-  data: withdrawData,
-}));
 // Submit gasless via Kora (user pays NOTHING)
 ```
 
@@ -669,6 +690,7 @@ withdrawTx.add(new TransactionInstruction({
 ## 9. Kora Gasless Integration
 
 Kora (Solana Foundation) provides gasless transaction support. Used for:
+
 - **Registration** (Kora pays rent + TX fees)
 - **Withdrawal** (Receiver pays NOTHING to claim funds)
 
@@ -692,13 +714,17 @@ Kora (Solana Foundation) provides gasless transaction support. Used for:
 ### Extracting Signature from Kora Response
 
 ```typescript
-const signedTxBytes = Buffer.from(koraResult.signed_transaction, 'base64');
-const signatureBytes = signedTxBytes.slice(1, 65); // byte 0 = sig count, 1-64 = feePayer sig
+const signedTxBytes = Buffer.from(koraResult.signed_transaction, 'base64')
+const signatureBytes = signedTxBytes.slice(1, 65) // byte 0 = sig count, 1-64 = feePayer sig
 // Convert to base58 for explorer links
-const bs58Chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-let sig = '', num = BigInt(0);
-for (const byte of signatureBytes) num = num * BigInt(256) + BigInt(byte);
-while (num > 0) { sig = bs58Chars[Number(num % BigInt(58))] + sig; num /= BigInt(58); }
+const bs58Chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+let sig = '',
+  num = BigInt(0)
+for (const byte of signatureBytes) num = num * BigInt(256) + BigInt(byte)
+while (num > 0) {
+  sig = bs58Chars[Number(num % BigInt(58))] + sig
+  num /= BigInt(58)
+}
 ```
 
 ---
@@ -707,24 +733,24 @@ while (num > 0) { sig = bs58Chars[Number(num % BigInt(58))] + sig; num /= BigInt
 
 All PDAs are derived as `PublicKey.findProgramAddressSync(seeds, programId)`.
 
-| PDA | Seeds | Program |
-|---|---|---|
-| Registry | `["registry", owner]` | REGISTRY |
-| Announcement | `["announcement", nonce]` | STEALTH |
-| Stealth Vault | `["stealth_vault", stealthPubkey]` | STEALTH |
-| PER Mixer Pool | `["per-mixer-pool-oceanvault"]` | STEALTH |
-| Deposit Record SEQ | `["deposit-seq", seqId(8B LE)]` | STEALTH |
-| Input Escrow SEQ | `["input-seq", seqId(8B LE)]` | STEALTH |
-| Output Escrow | `["output-escrow", stealthPubkey]` | STEALTH |
-| Claim Escrow | `["claim-escrow", nonce]` | STEALTH |
-| X-Wing Ciphertext | `["xwing-ct", escrowPda]` | STEALTH |
-| Escrow Buffer | `["buffer", escrowPda]` | STEALTH |
-| Delegation Record | `["delegation", account]` | DELEGATION |
+| PDA                 | Seeds                              | Program    |
+| ------------------- | ---------------------------------- | ---------- |
+| Registry            | `["registry", owner]`              | REGISTRY   |
+| Announcement        | `["announcement", nonce]`          | STEALTH    |
+| Stealth Vault       | `["stealth_vault", stealthPubkey]` | STEALTH    |
+| PER Mixer Pool      | `["per-mixer-pool-oceanvault"]`    | STEALTH    |
+| Deposit Record SEQ  | `["deposit-seq", seqId(8B LE)]`    | STEALTH    |
+| Input Escrow SEQ    | `["input-seq", seqId(8B LE)]`      | STEALTH    |
+| Output Escrow       | `["output-escrow", stealthPubkey]` | STEALTH    |
+| Claim Escrow        | `["claim-escrow", nonce]`          | STEALTH    |
+| X-Wing Ciphertext   | `["xwing-ct", escrowPda]`          | STEALTH    |
+| Escrow Buffer       | `["buffer", escrowPda]`            | STEALTH    |
+| Delegation Record   | `["delegation", account]`          | DELEGATION |
 | Delegation Metadata | `["delegation-metadata", account]` | DELEGATION |
-| Permission | `["permission:", account]` | PERMISSION |
-| Tee Public Registry | `["tee-pubkey", owner]` | STEALTH |
-| Tee Secret Store | `["tee-secret", owner]` | STEALTH |
-| Pool Deposit | `["pool-deposit", nonce]` | STEALTH |
+| Permission          | `["permission:", account]`         | PERMISSION |
+| Tee Public Registry | `["tee-pubkey", owner]`            | STEALTH    |
+| Tee Secret Store    | `["tee-secret", owner]`            | STEALTH    |
+| Pool Deposit        | `["pool-deposit", nonce]`          | STEALTH    |
 
 ---
 
@@ -732,25 +758,25 @@ All PDAs are derived as `PublicKey.findProgramAddressSync(seeds, programId)`.
 
 ### Active (WAVETEK V4 SEQ — use these for new code)
 
-| Name | Hex | Decimal | Description |
-|---|---|---|---|
-| `CREATE_V4_DEPOSIT_SEQ` | `0x3B` | 59 | Create deposit record with seq_id |
-| `UPLOAD_V4_CIPHERTEXT` | `0x29` | 41 | Upload X-Wing ciphertext chunks |
-| `COMPLETE_V4_DEPOSIT_SEQ` | `0x3C` | 60 | Create input escrow + delegate |
-| `REGISTER_DEPOSIT` | `0x3A` | 58 | Mark deposit ready (crank) |
-| `INPUT_TO_POOL_SEQ` | `0x3D` | 61 | Input escrow → Pool (crank) |
-| `PREPARE_OUTPUT_SEQ` | `0x40` | 64 | Create output escrow (crank) |
-| `POOL_TO_ESCROW_SEQ` | `0x3E` | 62 | Pool → Output escrow (crank) |
-| `CLAIM_ESCROW_V4` | `0x27` | 39 | Claim via TEE on PER |
-| `WITHDRAW_FROM_OUTPUT_ESCROW` | `0x2F` | 47 | Withdraw from output escrow on L1 |
+| Name                          | Hex    | Decimal | Description                       |
+| ----------------------------- | ------ | ------- | --------------------------------- |
+| `CREATE_V4_DEPOSIT_SEQ`       | `0x3B` | 59      | Create deposit record with seq_id |
+| `UPLOAD_V4_CIPHERTEXT`        | `0x29` | 41      | Upload X-Wing ciphertext chunks   |
+| `COMPLETE_V4_DEPOSIT_SEQ`     | `0x3C` | 60      | Create input escrow + delegate    |
+| `REGISTER_DEPOSIT`            | `0x3A` | 58      | Mark deposit ready (crank)        |
+| `INPUT_TO_POOL_SEQ`           | `0x3D` | 61      | Input escrow → Pool (crank)       |
+| `PREPARE_OUTPUT_SEQ`          | `0x40` | 64      | Create output escrow (crank)      |
+| `POOL_TO_ESCROW_SEQ`          | `0x3E` | 62      | Pool → Output escrow (crank)      |
+| `CLAIM_ESCROW_V4`             | `0x27` | 39      | Claim via TEE on PER              |
+| `WITHDRAW_FROM_OUTPUT_ESCROW` | `0x2F` | 47      | Withdraw from output escrow on L1 |
 
 ### Registry Discriminators
 
-| Name | Buffer (8 bytes) |
-|---|---|
-| `INITIALIZE_REGISTRY` | `[0x01, 0, 0, 0, 0, 0, 0, 0]` |
-| `UPLOAD_KEY_CHUNK` | `[0x02, 0, 0, 0, 0, 0, 0, 0]` |
-| `FINALIZE_REGISTRY` | `[0x03, 0, 0, 0, 0, 0, 0, 0]` |
+| Name                          | Buffer (8 bytes)              |
+| ----------------------------- | ----------------------------- |
+| `INITIALIZE_REGISTRY`         | `[0x01, 0, 0, 0, 0, 0, 0, 0]` |
+| `UPLOAD_KEY_CHUNK`            | `[0x02, 0, 0, 0, 0, 0, 0, 0]` |
+| `FINALIZE_REGISTRY`           | `[0x03, 0, 0, 0, 0, 0, 0, 0]` |
 | `INITIALIZE_REGISTRY_GASLESS` | `[0x08, 0, 0, 0, 0, 0, 0, 0]` |
 
 ---
@@ -761,9 +787,9 @@ All PDAs are derived as `PublicKey.findProgramAddressSync(seeds, programId)`.
 
 ```typescript
 interface WaveSendParams {
-  recipientWallet: PublicKey;
-  amount: bigint;       // in lamports (1 SOL = 1_000_000_000)
-  mint?: PublicKey;      // undefined = SOL
+  recipientWallet: PublicKey
+  amount: bigint // in lamports (1 SOL = 1_000_000_000)
+  mint?: PublicKey // undefined = SOL
 }
 ```
 
@@ -771,15 +797,15 @@ interface WaveSendParams {
 
 ```typescript
 interface SendResult {
-  success: boolean;
-  signature?: string;       // L1 transaction signature
-  error?: string;
-  stealthPubkey?: Uint8Array;
-  ephemeralPubkey?: Uint8Array;
-  viewTag?: number;
-  vaultPda?: PublicKey;
-  escrowPda?: PublicKey;
-  isV4?: boolean;           // true for WAVETEK V4
+  success: boolean
+  signature?: string // L1 transaction signature
+  error?: string
+  stealthPubkey?: Uint8Array
+  ephemeralPubkey?: Uint8Array
+  viewTag?: number
+  vaultPda?: PublicKey
+  escrowPda?: PublicKey
+  isV4?: boolean // true for WAVETEK V4
 }
 ```
 
@@ -788,27 +814,34 @@ interface SendResult {
 ```typescript
 interface UseWaveSendReturn {
   // State
-  isInitialized: boolean;    // Keys derived
-  isRegistered: boolean;     // On-chain registry exists
-  isPoolRegistered: boolean; // Pool Registry status
-  isLoading: boolean;
-  isSending: boolean;
-  error: string | null;
-  registrationProgress: RegistrationProgress | null;
+  isInitialized: boolean // Keys derived
+  isRegistered: boolean // On-chain registry exists
+  isPoolRegistered: boolean // Pool Registry status
+  isLoading: boolean
+  isSending: boolean
+  error: string | null
+  registrationProgress: RegistrationProgress | null
 
   // Actions
-  initializeKeys: () => Promise<boolean>;
-  register: () => Promise<boolean>;
-  send: (params: { recipientAddress: string; amount: string; tokenMint?: string }) => Promise<SendResult>;
-  checkRecipientRegistered: (address: string) => Promise<boolean>;
-  claimByVault: (vaultAddress: string, stealthPubkey: Uint8Array) => Promise<{ success: boolean; signature?: string; error?: string }>;
-  
-  // Pool Registry Methods
-  registerPoolRegistry: () => Promise<boolean>;
-  sendViaPool: (recipientAddress: string, amount: string) => Promise<SendResult>;
-  checkPoolRegistered: (address: string) => Promise<boolean>;
+  initializeKeys: () => Promise<boolean>
+  register: () => Promise<boolean>
+  send: (params: {
+    recipientAddress: string
+    amount: string
+    tokenMint?: string
+  }) => Promise<SendResult>
+  checkRecipientRegistered: (address: string) => Promise<boolean>
+  claimByVault: (
+    vaultAddress: string,
+    stealthPubkey: Uint8Array
+  ) => Promise<{ success: boolean; signature?: string; error?: string }>
 
-  clearError: () => void;
+  // Pool Registry Methods
+  registerPoolRegistry: () => Promise<boolean>
+  sendViaPool: (recipientAddress: string, amount: string) => Promise<SendResult>
+  checkPoolRegistered: (address: string) => Promise<boolean>
+
+  clearError: () => void
 }
 ```
 
@@ -816,26 +849,26 @@ interface UseWaveSendReturn {
 
 ```typescript
 interface StealthKeyPair {
-  spendPrivkey: Uint8Array; // 32 bytes
-  spendPubkey: Uint8Array;  // 32 bytes
-  viewPrivkey: Uint8Array;  // 32 bytes
-  viewPubkey: Uint8Array;   // 32 bytes
-  xwingKeys?: XWingKeyPair;
+  spendPrivkey: Uint8Array // 32 bytes
+  spendPubkey: Uint8Array // 32 bytes
+  viewPrivkey: Uint8Array // 32 bytes
+  viewPubkey: Uint8Array // 32 bytes
+  xwingKeys?: XWingKeyPair
 }
 
 interface XWingKeyPair {
-  publicKey: XWingPublicKey;
-  secretKey: XWingSecretKey;
+  publicKey: XWingPublicKey
+  secretKey: XWingSecretKey
 }
 
 interface XWingPublicKey {
-  mlkem: Uint8Array;   // 1184 bytes
-  x25519: Uint8Array;  // 32 bytes
+  mlkem: Uint8Array // 1184 bytes
+  x25519: Uint8Array // 32 bytes
 }
 
 interface XWingSecretKey {
-  mlkem: Uint8Array;   // 2400 bytes
-  x25519: Uint8Array;  // 32 bytes
+  mlkem: Uint8Array // 2400 bytes
+  x25519: Uint8Array // 32 bytes
 }
 ```
 
@@ -846,25 +879,43 @@ interface XWingSecretKey {
 ### What to Reuse As-Is
 
 The entire `lib/stealth/` directory is **mostly portable** to React Native:
-- `config.ts` — Constants, PDA derivations (uses `@solana/web3.js`)
+
+- `config.ts` — Constants, PDA derivations (update to use `@solana/kit` APIs)
 - `types.ts` — Pure TypeScript interfaces
 - `crypto.ts` — Uses `@noble/*` libraries (pure JS, no browser APIs except AES-GCM)
 - `xwing.ts` — Uses `@noble/post-quantum` (pure JS)
-- `scanner.ts` — Uses `@solana/web3.js` Connection (works on mobile)
-- `client.ts` — `WaveStealthClient` class (core logic, all portable)
+- `scanner.ts` — Uses Solana Kit RPC (update to `@solana/kit`)
+- `client.ts` — `WaveStealthClient` class (core logic, update to Solana Kit APIs)
 
 ### What Needs Adaptation
 
-| Component | Web | Mobile Approach |
-|---|---|---|
-| **Web Worker** | `stealth-worker.ts` + `stealth-worker-client.ts` | Replace with in-memory singleton module. Use `expo-secure-store` for persistence. |
-| **AES-GCM** | `crypto.subtle` (Web Crypto API) | Use `react-native-quick-crypto` or `expo-crypto` |
-| **Wallet Adapter** | `@solana/wallet-adapter-react` | Use Mobile Wallet Adapter (MWA) or app's internal wallet |
-| **RPC Proxy** | Next.js API routes (`/api/v1/rpc`) | Direct RPC calls or separate backend service |
-| **PER RPC Proxy** | Next.js API route (`/api/v1/per-rpc`) | Direct calls to `https://devnet-as.magicblock.app` |
-| **Crank Trigger** | `fetch(/api/v1/crank)` | Call crank endpoint directly |
-| **Toast Notifications** | `sonner` | Use React Native toast library |
-| **Buffer Polyfill** | Available in Next.js | Need `buffer` polyfill for React Native |
+| Component               | Web                                              | Mobile Approach                                                                   |
+| ----------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------- |
+| **Web Worker**          | `stealth-worker.ts` + `stealth-worker-client.ts` | Replace with in-memory singleton module. Use `expo-secure-store` for persistence. |
+| **AES-GCM**             | `crypto.subtle` (Web Crypto API)                 | Use `react-native-quick-crypto` or `expo-crypto`                                  |
+| **Wallet Adapter**      | `@solana/wallet-adapter-react`                   | Use Mobile Wallet Adapter (MWA) or app's internal wallet                          |
+| **RPC Proxy**           | Next.js API routes (`/api/v1/rpc`)               | Direct RPC calls or separate backend service                                      |
+| **PER RPC Proxy**       | Next.js API route (`/api/v1/per-rpc`)            | Direct calls to `https://devnet-as.magicblock.app`                                |
+| **Crank Trigger**       | `fetch(/api/v1/crank)`                           | Call crank endpoint directly                                                      |
+| **Toast Notifications** | `sonner`                                         | Use React Native toast library                                                    |
+| **Buffer Polyfill**     | Available in Next.js                             | Need `buffer` polyfill for React Native                                           |
+
+### Solana Kit vs web3.js v1 Key Differences
+
+When porting the stealth library to mobile with Solana Kit, note these key API differences:
+
+| Feature              | web3.js v1                           | Solana Kit (`@solana/kit`)                         |
+| -------------------- | ------------------------------------ | -------------------------------------------------- |
+| **RPC Client**       | `new Connection(url)` class          | `createSolanaRpc(url)` function                    |
+| **Addresses**        | `new PublicKey(str)` class           | `address(str)` function (returns string)           |
+| **Transactions**     | `new Transaction()` class            | Functional: `createTransactionMessage()`, `pipe()` |
+| **Signing**          | `tx.sign(keypair)`                   | `signTransactionMessageWithSigners()`              |
+| **Sending**          | `connection.sendRawTransaction()`    | `rpc.sendTransaction().send()`                     |
+| **Blockhash**        | `connection.getLatestBlockhash()`    | `rpc.getLatestBlockhash().send()`                  |
+| **Account Info**     | `connection.getAccountInfo(pubkey)`  | `rpc.getAccountInfo(address).send()`               |
+| **Program Accounts** | `connection.getProgramAccounts()`    | `rpc.getProgramAccounts().send()`                  |
+| **PDA Derivation**   | `PublicKey.findProgramAddressSync()` | `findProgramAddress()` (async)                     |
+| **Encoding**         | `bs58.encode()`                      | Built-in base58 support in `Address` type          |
 
 ### AES-GCM Replacement for Mobile
 
@@ -872,21 +923,21 @@ The `encryptDestinationWallet` and `decryptDestinationWallet` functions use Web 
 
 ```typescript
 // Option 1: react-native-quick-crypto (recommended)
-import { createCipheriv, createDecipheriv, randomBytes } from 'react-native-quick-crypto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'react-native-quick-crypto'
 
 export function encryptDestinationWallet(
   destination: Uint8Array,
   sharedSecret: Uint8Array
 ): Uint8Array {
-  const nonce = randomBytes(12);
-  const cipher = createCipheriv('aes-256-gcm', sharedSecret, nonce);
-  const encrypted = Buffer.concat([cipher.update(destination), cipher.final()]);
-  const tag = cipher.getAuthTag();
-  return Buffer.concat([nonce, encrypted, tag]); // 12 + 32 + 16 = 60 bytes → packed to 48
+  const nonce = randomBytes(12)
+  const cipher = createCipheriv('aes-256-gcm', sharedSecret, nonce)
+  const encrypted = Buffer.concat([cipher.update(destination), cipher.final()])
+  const tag = cipher.getAuthTag()
+  return Buffer.concat([nonce, encrypted, tag]) // 12 + 32 + 16 = 60 bytes → packed to 48
 }
 
 // Option 2: Use @noble/ciphers if available
-import { gcm } from '@noble/ciphers/aes';
+import { gcm } from '@noble/ciphers/aes'
 ```
 
 ### Transaction Confirmation (Avoid WebSocket)
@@ -894,22 +945,23 @@ import { gcm } from '@noble/ciphers/aes';
 Both hooks use HTTP polling instead of WebSocket-based confirmation to avoid connectivity issues:
 
 ```typescript
+import type { Rpc, SolanaRpcApi, Signature } from '@solana/kit'
+
 async function confirmTransactionPolling(
-  connection: Connection,
-  signature: string,
+  rpc: Rpc<SolanaRpcApi>,
+  signature: Signature,
   maxAttempts = 6,
   intervalMs = 500
 ): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
-    const status = await connection.getSignatureStatus(signature);
-    if (status?.value?.confirmationStatus === 'confirmed' ||
-        status?.value?.confirmationStatus === 'finalized') {
-      return true;
+    const { value: status } = await rpc.getSignatureStatus(signature).send()
+    if (status?.confirmationStatus === 'confirmed' || status?.confirmationStatus === 'finalized') {
+      return true
     }
-    if (status?.value?.err) return false;
-    await new Promise(r => setTimeout(r, intervalMs));
+    if (status?.value?.err) return false
+    await new Promise((r) => setTimeout(r, intervalMs))
   }
-  return true; // Optimistic return
+  return true // Optimistic return
 }
 ```
 
@@ -921,8 +973,8 @@ async function confirmTransactionPolling(
 
 ```json
 {
-  "@solana/web3.js": "^1.x",
-  "@solana/spl-token": "^0.4.x",
+  "@solana/kit": "^2.x",
+  "@solana-program/token": "^0.x",
   "@noble/curves": "^1.x",
   "@noble/hashes": "^1.x",
   "@noble/post-quantum": "^0.x",
@@ -932,15 +984,34 @@ async function confirmTransactionPolling(
 }
 ```
 
+> **Note:** `@solana/kit` is the new name for `@solana/web3.js` v2. It's a complete rewrite with:
+>
+> - Tree-shakable, functional API (no classes)
+> - Native Ed25519 support via Web Crypto API
+> - Native `bigint` for large numbers
+> - Modular package structure (`@solana/rpc`, `@solana/transactions`, etc.)
+> - See: https://github.com/anza-xyz/kit
+
 ### React Native Polyfills
 
 ```typescript
 // In your app entry point (before any crypto code):
-import { Buffer } from 'buffer';
-global.Buffer = Buffer;
+import { Buffer } from 'buffer'
+global.Buffer = Buffer
+
+import 'react-native-url-polyfill/auto'
+import 'react-native-get-random-values'
+```
+
+### React Native Polyfills
+
+```typescript
+// In your app entry point (before any crypto code):
+import { Buffer } from 'buffer'
+global.Buffer = Buffer
 
 // If using @solana/web3.js, you may also need:
-import 'react-native-url-polyfill/auto';
+import 'react-native-url-polyfill/auto'
 ```
 
 ---
@@ -1030,17 +1101,18 @@ Then create a **polyfill file** that runs before anything else:
 
 ```typescript
 // src/polyfills.ts — IMPORT THIS FIRST in app/_layout.tsx
-import 'react-native-get-random-values';     // Must be first (randomBytes)
-import 'react-native-url-polyfill/auto';       // URL constructor
-import { Buffer } from 'buffer';
-global.Buffer = Buffer;
+import 'react-native-get-random-values' // Must be first (randomBytes)
+import 'react-native-url-polyfill/auto' // URL constructor
+import { Buffer } from 'buffer'
+global.Buffer = Buffer
 ```
 
 In your root layout:
+
 ```typescript
 // app/_layout.tsx
-import '../src/polyfills';   // ← VERY FIRST LINE, before any other imports
-import { Stack } from 'expo-router';
+import '../src/polyfills' // ← VERY FIRST LINE, before any other imports
+import { Stack } from 'expo-router'
 // ...rest of layout
 ```
 
@@ -1049,22 +1121,24 @@ import { Stack } from 'expo-router';
 1. Run `npx expo start` → app boots to your home page with **no red error screen**
 2. Open the Expo dev tools console — no warnings about `Buffer is not defined` or `crypto is not defined`
 3. Add this temporary test in any screen component and verify it logs correctly:
+
 ```typescript
 // Temporary — remove after testing
-import { Buffer } from 'buffer';
-console.log('Buffer works:', Buffer.from('hello').toString('hex')); 
+import { Buffer } from 'buffer'
+console.log('Buffer works:', Buffer.from('hello').toString('hex'))
 // Expected: "Buffer works: 68656c6c6f"
 
-import { sha3_256 } from 'js-sha3';
-console.log('SHA3 works:', sha3_256('test').slice(0, 16));
+import { sha3_256 } from 'js-sha3'
+console.log('SHA3 works:', sha3_256('test').slice(0, 16))
 // Expected: "SHA3 works: 36f028580bb02cc8" (first 16 chars)
 
-import { ed25519 } from '@noble/curves/ed25519';
-const privKey = ed25519.utils.randomPrivateKey();
-const pubKey = ed25519.getPublicKey(privKey);
-console.log('Ed25519 works:', pubKey.length);
+import { ed25519 } from '@noble/curves/ed25519'
+const privKey = ed25519.utils.randomPrivateKey()
+const pubKey = ed25519.getPublicKey(privKey)
+console.log('Ed25519 works:', pubKey.length)
 // Expected: "Ed25519 works: 32"
 ```
+
 4. If you see `Can't find variable: crypto` → your `react-native-get-random-values` import is not the FIRST import
 5. If you see `Buffer is not defined` → your polyfills file isn't being imported before other code
 
@@ -1073,44 +1147,56 @@ console.log('Ed25519 works:', pubKey.length);
 ### Step 2 — Install Solana Dependencies
 
 ```bash
-npm install @solana/web3.js@1 @solana/spl-token bs58
+npm install @solana/kit bs58
 ```
 
 > [!NOTE]
-> Use `@solana/web3.js` v1 (not v2). The stealth SDK is written for v1 APIs (`Connection`, `Transaction`, `PublicKey`, `Keypair`, etc).
+> We use `@solana/kit` (formerly `@solana/web3.js` v2). This is the modern SDK from Anza with:
+>
+> - Functional API instead of class-based
+> - `createSolanaRpc()` instead of `new Connection()`
+> - `address()` instead of `new PublicKey()`
+> - Tree-shakable modules
+> - Native Ed25519 and bigint support
 
-Create a connection singleton:
+Create an RPC client singleton:
 
 ```typescript
-// src/lib/solana/connection.ts
-import { Connection } from '@solana/web3.js';
+// src/lib/solana/rpc.ts
+import { createSolanaRpc, devnet, type Rpc, type SolanaRpcApi } from '@solana/kit'
 
-const RPC_URL = 'https://api.devnet.solana.com';  // or your custom RPC
-const PER_URL = 'https://devnet-as.magicblock.app';
+const RPC_URL = 'https://api.devnet.solana.com'
+const PER_URL = 'https://devnet-as.magicblock.app'
 
-export const connection = new Connection(RPC_URL, { commitment: 'confirmed' });
-export const perConnection = new Connection(PER_URL, { commitment: 'confirmed' });
+export const rpc: Rpc<SolanaRpcApi> = createSolanaRpc(devnet(RPC_URL))
+export const perRpc: Rpc<SolanaRpcApi> = createSolanaRpc(devnet(PER_URL))
 ```
 
 **✅ Acceptance Criteria for Step 2:**
 
 1. Add this test in any screen's `useEffect`:
+
 ```typescript
-import { connection } from '../lib/solana/connection';
+import { rpc } from '../lib/solana/rpc'
 
 useEffect(() => {
-  connection.getSlot().then(slot => {
-    console.log('✅ Solana devnet connected. Current slot:', slot);
-    // Expected: a large number like 312847561
-  }).catch(err => {
-    console.error('❌ Solana connection failed:', err.message);
-  });
-}, []);
+  rpc
+    .getSlot()
+    .send()
+    .then((slot) => {
+      console.log('✅ Solana devnet connected. Current slot:', slot)
+      // Expected: a large number like 312847561
+    })
+    .catch((err) => {
+      console.error('❌ Solana connection failed:', err.message)
+    })
+}, [])
 ```
+
 2. You should see `✅ Solana devnet connected. Current slot: XXXXXXXX` in your console
 3. If you see `Network request failed` → check your device/emulator has internet access
 4. If you see `URL is not a constructor` → your `react-native-url-polyfill` import is missing
-5. Verify `@solana/web3.js` version in `package.json` is `1.x.x` (NOT `2.x`) — run `npm ls @solana/web3.js` to check
+5. Verify `@solana/kit` version in `package.json` is `2.x.x` — run `npm ls @solana/kit` to check
 
 ---
 
@@ -1118,16 +1204,16 @@ useEffect(() => {
 
 Copy these files from `apps/web/src/lib/stealth/` → your Expo app `src/lib/stealth/`:
 
-| # | File | Changes Needed |
-|---|---|---|
-| 1 | `config.ts` | ✅ None — all pure JS constants + `@solana/web3.js` PDAs |
-| 2 | `types.ts` | ✅ None — pure TypeScript interfaces |
-| 3 | `xwing.ts` | ✅ None — uses `@noble/*` (pure JS) |
-| 4 | `crypto.ts` | ⚠️ Replace `crypto.subtle.encrypt/decrypt` with `react-native-quick-crypto` (see Step 4) |
-| 5 | `scanner.ts` | ✅ None — uses `Connection.getProgramAccounts()` |
-| 6 | `client.ts` | ⚠️ Remove `window.location`, replace Worker refs (see Step 5) |
-| 7 | `per-privacy.ts` | ⚠️ Hardcode PER URL instead of `/api/v1/per-rpc` proxy |
-| 8 | `index.ts` | ✅ Update re-exports to match new file structure |
+| #   | File             | Changes Needed                                                                            |
+| --- | ---------------- | ----------------------------------------------------------------------------------------- |
+| 1   | `config.ts`      | ✅ None — all pure JS constants + Solana Kit PDA APIs                                     |
+| 2   | `types.ts`       | ✅ None — pure TypeScript interfaces                                                      |
+| 3   | `xwing.ts`       | ✅ None — uses `@noble/*` (pure JS)                                                       |
+| 4   | `crypto.ts`      | ⚠️ Replace `crypto.subtle.encrypt/decrypt` with `react-native-quick-crypto` (see Step 4)  |
+| 5   | `scanner.ts`     | ✅ None — uses `Rpc.getProgramAccounts()` via `rpc.getAccountInfo()` pattern              |
+| 6   | `client.ts`      | ⚠️ Replace `window.location`, replace Worker refs, update to Solana Kit APIs (see Step 5) |
+| 7   | `per-privacy.ts` | ⚠️ Hardcode PER URL instead of `/api/v1/per-rpc` proxy                                    |
+| 8   | `index.ts`       | ✅ Update re-exports to match new file structure                                          |
 
 **Do NOT copy** `stealth-worker.ts` or `stealth-worker-client.ts` — these are Web Worker files. You'll replace them in Step 5.
 
@@ -1135,20 +1221,24 @@ Copy these files from `apps/web/src/lib/stealth/` → your Expo app `src/lib/ste
 
 1. Run `npx expo start` → app boots with **no red screen**
 2. Run this in your terminal to check for TypeScript errors:
+
 ```bash
 npx tsc --noEmit 2>&1 | grep "stealth/"
 # Expected: NO output (no errors in stealth files)
 # If you see errors, they will tell you exactly which import path is broken
 ```
-3. Add this temporary import test:
-```typescript
-import { PROGRAM_IDS, deriveStealthVaultPda } from '../lib/stealth/config';
-import { StealthKeyPair } from '../lib/stealth/crypto';
-import { DetectedEscrowV4 } from '../lib/stealth/scanner';
 
-console.log('✅ Stealth config loaded. Registry program:', PROGRAM_IDS.REGISTRY.toString());
+3. Add this temporary import test:
+
+```typescript
+import { PROGRAM_IDS, deriveStealthVaultPda } from '../lib/stealth/config'
+import { StealthKeyPair } from '../lib/stealth/crypto'
+import { DetectedEscrowV4 } from '../lib/stealth/scanner'
+
+console.log('✅ Stealth config loaded. Registry program:', PROGRAM_IDS.REGISTRY.toString())
 // Expected: "✅ Stealth config loaded. Registry program: DgoW9MneWt6B3mBZqDf52csXMtJpgqwa..."
 ```
+
 4. Common fix needed: if `client.ts` imports from `./stealth-worker-client`, **comment those imports out** for now (you'll replace them in Step 5)
 5. If `per-privacy.ts` imports from `'./config'` and fails, check you copied `config.ts` correctly
 
@@ -1161,38 +1251,32 @@ The web version uses `crypto.subtle.encrypt('AES-GCM', ...)`. React Native doesn
 ```typescript
 // In src/lib/stealth/crypto.ts — replace encryptDestinationWallet and decryptDestinationWallet
 
-import { createCipheriv, createDecipheriv, randomBytes } from 'react-native-quick-crypto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'react-native-quick-crypto'
 
 export async function encryptDestinationWallet(
-  destination: Uint8Array,  // 32-byte wallet pubkey
-  sharedSecret: Uint8Array  // 32-byte X-Wing shared secret
+  destination: Uint8Array, // 32-byte wallet pubkey
+  sharedSecret: Uint8Array // 32-byte X-Wing shared secret
 ): Promise<Uint8Array> {
-  const nonce = randomBytes(12);
-  const cipher = createCipheriv('aes-256-gcm', Buffer.from(sharedSecret), Buffer.from(nonce));
-  const encrypted = Buffer.concat([
-    cipher.update(Buffer.from(destination)),
-    cipher.final()
-  ]);
-  const tag = cipher.getAuthTag();
+  const nonce = randomBytes(12)
+  const cipher = createCipheriv('aes-256-gcm', Buffer.from(sharedSecret), Buffer.from(nonce))
+  const encrypted = Buffer.concat([cipher.update(Buffer.from(destination)), cipher.final()])
+  const tag = cipher.getAuthTag()
   // Pack: encrypted(32) + tag(16) = 48 bytes (nonce is derived from sharedSecret on-chain)
-  return new Uint8Array(Buffer.concat([encrypted, tag]));
+  return new Uint8Array(Buffer.concat([encrypted, tag]))
 }
 
 export async function decryptDestinationWallet(
-  encryptedData: Uint8Array,  // 48-byte packed ciphertext
+  encryptedData: Uint8Array, // 48-byte packed ciphertext
   sharedSecret: Uint8Array
 ): Promise<Uint8Array> {
-  const encrypted = encryptedData.slice(0, 32);
-  const tag = encryptedData.slice(32, 48);
+  const encrypted = encryptedData.slice(0, 32)
+  const tag = encryptedData.slice(32, 48)
   // Derive nonce from sharedSecret (first 12 bytes)
-  const nonce = sharedSecret.slice(0, 12);
-  const decipher = createDecipheriv('aes-256-gcm', Buffer.from(sharedSecret), Buffer.from(nonce));
-  decipher.setAuthTag(Buffer.from(tag));
-  const decrypted = Buffer.concat([
-    decipher.update(Buffer.from(encrypted)),
-    decipher.final()
-  ]);
-  return new Uint8Array(decrypted);
+  const nonce = sharedSecret.slice(0, 12)
+  const decipher = createDecipheriv('aes-256-gcm', Buffer.from(sharedSecret), Buffer.from(nonce))
+  decipher.setAuthTag(Buffer.from(tag))
+  const decrypted = Buffer.concat([decipher.update(Buffer.from(encrypted)), decipher.final()])
+  return new Uint8Array(decrypted)
 }
 ```
 
@@ -1202,29 +1286,31 @@ export async function decryptDestinationWallet(
 **✅ Acceptance Criteria for Step 4:**
 
 1. Add this round-trip test in any screen:
+
 ```typescript
-import { encryptDestinationWallet, decryptDestinationWallet } from '../lib/stealth/crypto';
+import { encryptDestinationWallet, decryptDestinationWallet } from '../lib/stealth/crypto'
 
 useEffect(() => {
-  (async () => {
+  ;(async () => {
     // Create a fake 32-byte wallet pubkey and 32-byte shared secret
-    const fakeWallet = new Uint8Array(32).fill(0xAB);
-    const fakeSecret = new Uint8Array(32).fill(0xCD);
+    const fakeWallet = new Uint8Array(32).fill(0xab)
+    const fakeSecret = new Uint8Array(32).fill(0xcd)
 
-    const encrypted = await encryptDestinationWallet(fakeWallet, fakeSecret);
-    console.log('Encrypted length:', encrypted.length);
+    const encrypted = await encryptDestinationWallet(fakeWallet, fakeSecret)
+    console.log('Encrypted length:', encrypted.length)
     // Expected: 48 (32 ciphertext + 16 auth tag)
 
-    const decrypted = await decryptDestinationWallet(encrypted, fakeSecret);
-    console.log('Decrypted length:', decrypted.length);
+    const decrypted = await decryptDestinationWallet(encrypted, fakeSecret)
+    console.log('Decrypted length:', decrypted.length)
     // Expected: 32
 
-    const match = fakeWallet.every((b, i) => b === decrypted[i]);
-    console.log('✅ AES-GCM round-trip:', match ? 'PASS' : '❌ FAIL');
+    const match = fakeWallet.every((b, i) => b === decrypted[i])
+    console.log('✅ AES-GCM round-trip:', match ? 'PASS' : '❌ FAIL')
     // Expected: "✅ AES-GCM round-trip: PASS"
-  })();
-}, []);
+  })()
+}, [])
 ```
+
 2. You MUST see `PASS`. If you see `FAIL`, the nonce derivation doesn't match the web version
 3. If you see `createCipheriv is not a function` → `react-native-quick-crypto` native module isn't linked. Run `npx expo prebuild` and rebuild
 4. If you see `unsupported algorithm` → make sure you're using `'aes-256-gcm'` exactly
@@ -1237,61 +1323,65 @@ Instead of a Web Worker, create a **module-level singleton** that holds keys in 
 
 ```typescript
 // src/lib/stealth/key-manager.ts
-import { generateViewingKeys, StealthKeyPair } from './crypto';
-import { serializeXWingPublicKey } from './xwing';
-import * as SecureStore from 'expo-secure-store';
+import { generateViewingKeys, StealthKeyPair } from './crypto'
+import { serializeXWingPublicKey } from './xwing'
+import * as SecureStore from 'expo-secure-store'
 
 // ═══════ PRIVATE STATE (never export the keys directly) ═══════
-let keys: StealthKeyPair | null = null;
+let keys: StealthKeyPair | null = null
 
 export interface StealthPublicKeys {
-  spendPubkey: Uint8Array;
-  viewPubkey: Uint8Array;
-  xwingPubkey: Uint8Array;
+  spendPubkey: Uint8Array
+  viewPubkey: Uint8Array
+  xwingPubkey: Uint8Array
 }
 
 // Initialize keys from wallet signature
 export function initializeKeys(signature: Uint8Array): StealthPublicKeys {
-  if (keys) wipeKeys();
+  if (keys) wipeKeys()
 
-  keys = generateViewingKeys(signature);
+  keys = generateViewingKeys(signature)
 
   // Zero the signature immediately (root seed)
-  signature.fill(0);
+  signature.fill(0)
 
   return {
     spendPubkey: new Uint8Array(keys.spendPubkey),
     viewPubkey: new Uint8Array(keys.viewPubkey),
     xwingPubkey: serializeXWingPublicKey(keys.xwingKeys!.publicKey),
-  };
+  }
 }
 
 // Get keys (for scanner, client, etc)
-export function getKeys(): StealthKeyPair | null { return keys; }
+export function getKeys(): StealthKeyPair | null {
+  return keys
+}
 
 // Check if initialized
-export function isReady(): boolean { return keys !== null; }
+export function isReady(): boolean {
+  return keys !== null
+}
 
 // Get public keys only (safe to expose)
 export function getPublicKeys(): StealthPublicKeys | null {
-  if (!keys) return null;
+  if (!keys) return null
   return {
     spendPubkey: new Uint8Array(keys.spendPubkey),
     viewPubkey: new Uint8Array(keys.viewPubkey),
     xwingPubkey: serializeXWingPublicKey(keys.xwingKeys!.publicKey),
-  };
+  }
 }
 
 // Securely wipe all key material
 export function wipeKeys(): void {
-  if (!keys) return;
-  keys.spendPrivkey.fill(0);
-  keys.viewPrivkey.fill(0);
+  if (!keys) return
+  keys.spendPrivkey.fill(0)
+  keys.viewPrivkey.fill(0)
   if (keys.xwingKeys) {
-    keys.xwingKeys.secretKey.mlkem.fill(0);
-    keys.xwingKeys.secretKey.x25519.fill(0);
+    keys.xwingKeys.secretKey.mlkem.fill(0)
+    keys.xwingKeys.secretKey.x25519.fill(0)
   }
-  keys = null;
+  keys = null
 }
 
 // Persist public keys to SecureStore (so we know registration status across app restarts)
@@ -1303,96 +1393,166 @@ export async function cachePublicKeys(walletAddress: string, pubKeys: StealthPub
       view: Buffer.from(pubKeys.viewPubkey).toString('hex'),
       xwing: Buffer.from(pubKeys.xwingPubkey).toString('hex'),
     })
-  );
+  )
 }
 ```
 
 **✅ Acceptance Criteria for Step 5:**
 
 1. Add this test:
+
 ```typescript
-import * as KeyManager from '../lib/stealth/key-manager';
+import * as KeyManager from '../lib/stealth/key-manager'
 
 useEffect(() => {
   // Use a deterministic 64-byte fake signature for testing
-  const fakeSig = new Uint8Array(64);
-  for (let i = 0; i < 64; i++) fakeSig[i] = i;
+  const fakeSig = new Uint8Array(64)
+  for (let i = 0; i < 64; i++) fakeSig[i] = i
 
-  console.log('Before init - isReady:', KeyManager.isReady());
+  console.log('Before init - isReady:', KeyManager.isReady())
   // Expected: false
 
-  const pubKeys = KeyManager.initializeKeys(fakeSig);
-  console.log('After init - isReady:', KeyManager.isReady());
+  const pubKeys = KeyManager.initializeKeys(fakeSig)
+  console.log('After init - isReady:', KeyManager.isReady())
   // Expected: true
 
-  console.log('spendPubkey length:', pubKeys.spendPubkey.length);
+  console.log('spendPubkey length:', pubKeys.spendPubkey.length)
   // Expected: 32
-  console.log('viewPubkey length:', pubKeys.viewPubkey.length);
+  console.log('viewPubkey length:', pubKeys.viewPubkey.length)
   // Expected: 32
-  console.log('xwingPubkey length:', pubKeys.xwingPubkey.length);
+  console.log('xwingPubkey length:', pubKeys.xwingPubkey.length)
   // Expected: 1216
 
   // Verify signature was zeroed (security check)
-  console.log('Signature zeroed:', fakeSig.every(b => b === 0));
+  console.log(
+    'Signature zeroed:',
+    fakeSig.every((b) => b === 0)
+  )
   // Expected: true
 
   // Test getKeys returns non-null
-  const keys = KeyManager.getKeys();
-  console.log('Has private keys:', keys !== null && keys.spendPrivkey.length === 32);
+  const keys = KeyManager.getKeys()
+  console.log('Has private keys:', keys !== null && keys.spendPrivkey.length === 32)
   // Expected: true
 
-  KeyManager.wipeKeys();
-  console.log('After wipe - isReady:', KeyManager.isReady());
+  KeyManager.wipeKeys()
+  console.log('After wipe - isReady:', KeyManager.isReady())
   // Expected: false
-  console.log('After wipe - getKeys:', KeyManager.getKeys());
+  console.log('After wipe - getKeys:', KeyManager.getKeys())
   // Expected: null
 
-  console.log('✅ Key Manager: ALL TESTS PASSED');
-}, []);
+  console.log('✅ Key Manager: ALL TESTS PASSED')
+}, [])
 ```
+
 2. All 7 console logs should match the expected values
 3. Key thing to verify: `xwingPubkey.length === 1216` — this proves ML-KEM-768 key generation worked
 4. If `xwingPubkey.length` is wrong → `@noble/post-quantum` may not be installed or may have a version conflict
 
 ---
 
-### Step 6 — Update `client.ts` for Mobile
+### Step 6 — Update `client.ts` for Mobile + Solana Kit
 
-Search and replace these patterns in your copied `client.ts`:
+The `client.ts` file needs updates for both the mobile environment (removing Web Worker references) and Solana Kit API changes.
 
-| Find | Replace With |
-|---|---|
-| `StealthWorkerClient.getInstance()` | `import * as KeyManager from './key-manager'` |
-| `this.worker?.init(signature)` | `KeyManager.initializeKeys(signature)` |
+#### 6a. Replace Web Worker References
+
+| Find                                  | Replace With                                                                             |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `StealthWorkerClient.getInstance()`   | `import * as KeyManager from './key-manager'`                                            |
+| `this.worker?.init(signature)`        | `KeyManager.initializeKeys(signature)`                                                   |
 | `this.worker?.checkEscrows(deposits)` | Use `scanForEscrowsV4()` from `scanner.ts` directly (pass `getKeys()` instead of worker) |
-| `this.worker?.getRegistrationKey()` | `KeyManager.getPublicKeys()?.xwingPubkey` |
-| `this.worker?.wipe()` | `KeyManager.wipeKeys()` |
-| `window.location.origin` | Your crank API URL constant (e.g. `CRANK_API_URL`) |
-| `fetch('/api/v1/...')` | Direct fetch to the actual endpoint URL |
+| `this.worker?.getRegistrationKey()`   | `KeyManager.getPublicKeys()?.xwingPubkey`                                                |
+| `this.worker?.wipe()`                 | `KeyManager.wipeKeys()`                                                                  |
+| `window.location.origin`              | Your crank API URL constant (e.g. `CRANK_API_URL`)                                       |
+| `fetch('/api/v1/...')`                | Direct fetch to the actual endpoint URL                                                  |
+
+#### 6b. Update to Solana Kit APIs
+
+Key API migrations from `@solana/web3.js` v1 to `@solana/kit`:
+
+| Old (web3.js v1)                                          | New (Solana Kit)                                                                                    |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `import { Connection, PublicKey } from '@solana/web3.js'` | `import { createSolanaRpc, address, type Address, type Rpc, type SolanaRpcApi } from '@solana/kit'` |
+| `new Connection(url)`                                     | `createSolanaRpc(url)`                                                                              |
+| `new PublicKey(str)`                                      | `address(str)`                                                                                      |
+| `pubkey.toBase58()`                                       | `pubkey` (already a base58 string)                                                                  |
+| `pubkey.toBytes()`                                        | `Buffer.from(pubkey, 'base58')` or use `addressCodec`                                               |
+| `connection.getBalance(pubkey)`                           | `rpc.getBalance(address(pubkey)).send()`                                                            |
+| `connection.getAccountInfo(pubkey)`                       | `rpc.getAccountInfo(address(pubkey)).send()`                                                        |
+| `connection.getLatestBlockhash()`                         | `rpc.getLatestBlockhash().send()`                                                                   |
+| `connection.getProgramAccounts(programId)`                | `rpc.getProgramAccounts(address(programId)).send()`                                                 |
+| `findProgramAddressSync(seeds, programId)`                | `findProgramAddress(seeds, address(programId))` (async) or use `getPda`                             |
+| `Transaction.add(instruction)`                            | `pipe(createTransactionMessage({ instructions: [...] }), ...)`                                      |
+| `tx.serialize()`                                          | `transactionCodec.encode(tx)`                                                                       |
+| `connection.sendRawTransaction(tx)`                       | `rpc.sendTransaction(base64Tx, { encoding: 'base64' }).send()`                                      |
+
+#### 6c. Example: Updated `client.ts` Core Methods
+
+```typescript
+// src/lib/stealth/client.ts
+import {
+  createSolanaRpc,
+  address,
+  type Address,
+  type Rpc,
+  type SolanaRpcApi,
+  type Base64EncodedData,
+} from '@solana/kit'
+import * as KeyManager from './key-manager'
+
+export class WaveStealthClient {
+  private rpc: Rpc<SolanaRpcApi>
+  private perRpc: Rpc<SolanaRpcApi>
+
+  constructor(rpc: Rpc<SolanaRpcApi>, perRpc?: Rpc<SolanaRpcApi>) {
+    this.rpc = rpc
+    this.perRpc = perRpc ?? rpc
+  }
+
+  async isRecipientRegistered(owner: Address): Promise<boolean> {
+    const registryPda = await this.getRegistryPda(owner)
+    const { value: account } = await this.rpc
+      .getAccountInfo(registryPda, { encoding: 'base64' })
+      .send()
+    return account !== null
+  }
+
+  async getRegistryPda(owner: Address): Promise<Address> {
+    const [pda] = await findProgramAddress(
+      [Buffer.from('registry'), Buffer.from(owner, 'base58')],
+      address(PROGRAM_IDS.REGISTRY)
+    )
+    return pda
+  }
+}
+```
 
 **✅ Acceptance Criteria for Step 6:**
 
 1. Add this test:
+
 ```typescript
-import { WaveStealthClient } from '../lib/stealth/client';
-import { connection } from '../lib/solana/connection';
-import { PublicKey } from '@solana/web3.js';
+import { WaveStealthClient } from '../lib/stealth/client'
+import { rpc } from '../lib/solana/rpc'
+import { address } from '@solana/kit'
 
 useEffect(() => {
-  (async () => {
-    const client = new WaveStealthClient(connection);
-    console.log('✅ WaveStealthClient instantiated');
+  ;(async () => {
+    const client = new WaveStealthClient(rpc)
+    console.log('✅ WaveStealthClient instantiated')
 
     // Test: Check if a known devnet address is registered
-    const testAddr = new PublicKey('11111111111111111111111111111111');
-    const isReg = await client.isRecipientRegistered(testAddr);
-    console.log('System program registered?', isReg);
+    const testAddr = address('11111111111111111111111111111111')
+    const isReg = await client.isRecipientRegistered(testAddr)
+    console.log('System program registered?', isReg)
     // Expected: false (system program is obviously not registered)
 
-    console.log('✅ Client RPC call works');
-  })();
-}, []);
+    console.log('✅ Client RPC call works')
+  })()
+}, [])
 ```
+
 2. No `window is not defined` or `Worker is not defined` errors
 3. The RPC call to `isRecipientRegistered` completes without throwing
 4. If you see `window is not defined` → you missed replacing `window.location.origin` somewhere in `client.ts`
@@ -1403,41 +1563,55 @@ useEffect(() => {
 ### Step 7 — Set Up Wallet Integration
 
 For your mobile wallet, you need an adapter that provides:
-- `publicKey: PublicKey`
+
+- `publicKey: Address`
 - `signMessage(message: Uint8Array): Promise<Uint8Array>`
-- `signTransaction(tx: Transaction): Promise<Transaction>`
-- `signAllTransactions(txs: Transaction[]): Promise<Transaction[]>`
+- `signTransaction(tx: ITransactionMessageWithSigners): Promise<ITransactionMessageWithSigners>`
+- `signAllTransactions(txs: ITransactionMessageWithSigners[]): Promise<ITransactionMessageWithSigners[]>`
 
 If you're building an **embedded wallet** (keys stored on device):
 
 ```typescript
 // src/lib/wallet/wallet-adapter.ts
-import { Keypair, Transaction, PublicKey } from '@solana/web3.js';
-import * as SecureStore from 'expo-secure-store';
-import { sign } from '@noble/curves/ed25519';
+import {
+  address,
+  type Address,
+  createTransactionMessage,
+  partiallySignTransactionMessageWithSigners,
+  type ITransactionMessageWithSigners,
+} from '@solana/kit'
+import * as SecureStore from 'expo-secure-store'
+import { sign, getPublicKey } from '@noble/curves/ed25519'
 
 export class MobileWalletAdapter {
-  private keypair: Keypair;
+  private secretKey: Uint8Array
+  private _publicKey: Address
 
-  constructor(keypair: Keypair) {
-    this.keypair = keypair;
+  constructor(secretKey: Uint8Array) {
+    this.secretKey = secretKey
+    // Derive Ed25519 public key
+    const pubKeyBytes = getPublicKey(secretKey.slice(0, 32))
+    this._publicKey = address(Buffer.from(pubKeyBytes).toString('base58'))
   }
 
-  get publicKey(): PublicKey {
-    return this.keypair.publicKey;
+  get publicKey(): Address {
+    return this._publicKey
   }
 
   async signMessage(message: Uint8Array): Promise<Uint8Array> {
-    return sign(message, this.keypair.secretKey.slice(0, 32));
+    return sign(message, this.secretKey.slice(0, 32))
   }
 
-  async signTransaction(tx: Transaction): Promise<Transaction> {
-    tx.sign(this.keypair);
-    return tx;
+  async signTransaction(
+    tx: ITransactionMessageWithSigners
+  ): Promise<ITransactionMessageWithSigners> {
+    return await partiallySignTransactionMessageWithSigners(tx)
   }
 
-  async signAllTransactions(txs: Transaction[]): Promise<Transaction[]> {
-    return txs.map(tx => { tx.sign(this.keypair); return tx; });
+  async signAllTransactions(
+    txs: ITransactionMessageWithSigners[]
+  ): Promise<ITransactionMessageWithSigners[]> {
+    return await Promise.all(txs.map((tx) => partiallySignTransactionMessageWithSigners(tx)))
   }
 }
 ```
@@ -1448,47 +1622,59 @@ If using **Mobile Wallet Adapter (MWA)** for external wallets (Phantom, Solflare
 npm install @solana-mobile/mobile-wallet-adapter-protocol
 ```
 
+> [!NOTE]
+> MWA libraries use `@solana/web3.js` v1 types internally. You may need to convert between v1 `PublicKey` and Solana Kit `Address` types. See the QuickNode guide for a hybrid approach: https://www.quicknode.com/guides/solana-development/dapps/build-a-solana-mobile-app-on-android-with-react-native
+
 **✅ Acceptance Criteria for Step 7:**
 
 1. Test your wallet adapter:
-```typescript
-import { useWallet } from './hooks/useWallet'; // your hook
 
-const { wallet } = useWallet();
+```typescript
+import { useWallet } from './hooks/useWallet' // your hook
+
+const { wallet } = useWallet()
 
 useEffect(() => {
-  if (!wallet) return;
-  (async () => {
+  if (!wallet) return
+  ;(async () => {
     // Test 1: Public key exists
-    console.log('Wallet pubkey:', wallet.publicKey.toString());
+    console.log('Wallet pubkey:', wallet.publicKey)
     // Expected: a base58 string like "7xKX..." (your devnet wallet address)
 
     // Test 2: Sign a message
-    const msg = new TextEncoder().encode('WaveSend test message');
-    const sig = await wallet.signMessage(msg);
-    console.log('Signature length:', sig.length);
+    const msg = new TextEncoder().encode('WaveSend test message')
+    const sig = await wallet.signMessage(msg)
+    console.log('Signature length:', sig.length)
     // Expected: 64 (Ed25519 signature)
 
     // Test 3: Sign a dummy transaction
-    const { Transaction, SystemProgram, PublicKey } = require('@solana/web3.js');
-    const tx = new Transaction().add(
-      SystemProgram.transfer({
-        fromPubkey: wallet.publicKey,
-        toPubkey: wallet.publicKey,
-        lamports: 0,
-      })
-    );
-    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-    tx.feePayer = wallet.publicKey;
-    const signedTx = await wallet.signTransaction(tx);
-    console.log('TX signed:', signedTx.signatures.length > 0);
+    const { rpc } = from '../lib/solana/rpc'
+    const {
+      createTransactionMessage,
+      setTransactionMessageFeePayer,
+      setTransactionMessageLifetimeUsingBlockhash,
+      appendTransactionMessageInstruction,
+      compileTransaction,
+    } = from '@solana/kit'
+    const { value: blockhash } = await rpc.getLatestBlockhash().send()
+
+    const tx = await pipe(
+      createTransactionMessage({ version: 0 }),
+      (tx) => setTransactionMessageFeePayer(wallet.publicKey, tx),
+      (tx) => setTransactionMessageLifetimeUsingBlockhash(blockhash, tx)
+      // Add instructions...
+    )
+
+    const signedTx = await wallet.signTransaction(tx)
+    console.log('TX signed:', signedTx.signatures?.length > 0)
     // Expected: true
 
-    console.log('✅ Wallet adapter: ALL TESTS PASSED');
-  })();
-}, [wallet]);
+    console.log('✅ Wallet adapter: ALL TESTS PASSED')
+  })()
+}, [wallet])
 ```
-2. If using embedded wallet: verify the address matches what you'd get from `Keypair.fromSecretKey(yourKey).publicKey`
+
+2. If using embedded wallet: verify the address matches what you'd get from keypair derivation
 3. If using MWA: the Phantom/Solflare popup should appear when `signMessage` is called
 4. Signature length MUST be exactly 64 bytes — if not, your sign function implementation is wrong
 
@@ -1500,43 +1686,44 @@ Create `src/hooks/useWaveSend.ts`. Key changes from web version:
 
 ```typescript
 // src/hooks/useWaveSend.ts
-import { useState, useCallback, useEffect } from 'react';
-import { WaveStealthClient } from '../lib/stealth/client';
-import * as KeyManager from '../lib/stealth/key-manager';
-import { connection } from '../lib/solana/connection';
-import { useWallet } from './useWallet'; // your mobile wallet hook
+import { useState, useCallback, useEffect } from 'react'
+import { WaveStealthClient } from '../lib/stealth/client'
+import * as KeyManager from '../lib/stealth/key-manager'
+import { rpc, perRpc } from '../lib/solana/rpc'
+import { useWallet } from './useWallet' // your mobile wallet hook
 
 const STEALTH_SIGN_MESSAGE = `Sign this message to generate your WaveSwap stealth viewing keys.
 
 This signature will be used to derive your private viewing keys. Never share this signature with anyone.
 
-Domain: OceanVault:ViewingKeys:v1`;
+Domain: OceanVault:ViewingKeys:v1`
 
 export function useWaveSend() {
-  const { wallet } = useWallet();
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { wallet } = useWallet()
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [isRegistered, setIsRegistered] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSending, setIsSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const client = new WaveStealthClient(connection);
+  const client = new WaveStealthClient(rpc, perRpc)
 
   // Check registration on wallet connect
   useEffect(() => {
-    if (!wallet?.publicKey) return;
-    client.isRecipientRegistered(wallet.publicKey)
+    if (!wallet?.publicKey) return
+    client
+      .isRecipientRegistered(wallet.publicKey)
       .then(setIsRegistered)
-      .catch(() => {});
-  }, [wallet?.publicKey]);
+      .catch(() => {})
+  }, [wallet?.publicKey])
 
   const initializeKeys = useCallback(async (): Promise<boolean> => {
-    if (!wallet) return false;
-    setIsLoading(true);
+    if (!wallet) return false
+    setIsLoading(true)
     try {
-      const msg = new TextEncoder().encode(STEALTH_SIGN_MESSAGE);
-      const signature = await wallet.signMessage(msg);
-      const pubKeys = KeyManager.initializeKeys(new Uint8Array(signature));
+      const msg = new TextEncoder().encode(STEALTH_SIGN_MESSAGE)
+      const signature = await wallet.signMessage(msg)
+      const pubKeys = KeyManager.initializeKeys(new Uint8Array(signature))
 
       // Pass keys to client
       client.setStealthKeys({
@@ -1544,41 +1731,50 @@ export function useWaveSend() {
         viewPubkey: pubKeys.viewPubkey,
         xwingPubkey: pubKeys.xwingPubkey,
         // Private keys accessed internally via KeyManager.getKeys()
-      });
+      })
 
-      setIsInitialized(true);
-      return true;
+      setIsInitialized(true)
+      return true
     } catch (e: any) {
-      setError(e.message);
-      return false;
+      setError(e.message)
+      return false
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [wallet]);
+  }, [wallet])
 
   const register = useCallback(async (): Promise<boolean> => {
     // Call client.register() or client.registerSimple()
     // Uses Kora gasless — see Section 6
     // ...
-  }, [wallet, isInitialized]);
+  }, [wallet, isInitialized])
 
-  const send = useCallback(async (params: {
-    recipientAddress: string;
-    amount: string;
-    tokenMint?: string;
-  }) => {
-    // Call client.waveSendV4()
-    // See Section 7 for full flow
-    // ...
-  }, [wallet, isInitialized]);
+  const send = useCallback(
+    async (params: { recipientAddress: string; amount: string; tokenMint?: string }) => {
+      // Call client.waveSendV4()
+      // See Section 7 for full flow
+      // ...
+    },
+    [wallet, isInitialized]
+  )
 
-  return { isInitialized, isRegistered, isLoading, isSending, error, initializeKeys, register, send };
+  return {
+    isInitialized,
+    isRegistered,
+    isLoading,
+    isSending,
+    error,
+    initializeKeys,
+    register,
+    send,
+  }
 }
 ```
 
 **✅ Acceptance Criteria for Step 8:**
 
 1. Create a temporary test screen that uses the hook:
+
 ```typescript
 import { useWaveSend } from '../hooks/useWaveSend';
 import { View, Text, Pressable } from 'react-native';
@@ -1599,6 +1795,7 @@ export default function TestSendScreen() {
   );
 }
 ```
+
 2. **Before tapping Initialize:** Screen shows `Initialized: ❌ NO`
 3. **Tap Initialize → sign the stealth message** (wallet popup or embedded sign)
 4. **After signing:** Screen updates to `Initialized: ✅ YES`
@@ -1613,38 +1810,40 @@ export default function TestSendScreen() {
 
 Create `src/hooks/useAutoClaim.ts`. Key changes:
 
-- Replace `StealthWorkerClient` calls with `scanForEscrowsV4(connection, KeyManager.getKeys()!, perConnection)`
+- Replace `StealthWorkerClient` calls with `scanForEscrowsV4(rpc, KeyManager.getKeys()!, perRpc)`
 - Replace `setInterval` with a React Native-friendly interval (use `useEffect` + `setInterval` or `expo-task-manager` for background)
 - Use `KeyManager.getKeys()` instead of worker for X-Wing decapsulation
 
 ```typescript
 // Scanning loop
 useEffect(() => {
-  if (!isInitialized) return;
-  
+  if (!isInitialized) return
+
   const interval = setInterval(async () => {
-    const keys = KeyManager.getKeys();
-    if (!keys) return;
-    
-    const escrows = await scanForEscrowsV4(connection, keys, perConnection, scanCache);
-    const ours = escrows.filter(e => e.isOurs && !e.isWithdrawn);
-    setPendingClaims(ours);
-  }, 10_000); // 10 seconds
-  
-  return () => clearInterval(interval);
-}, [isInitialized]);
+    const keys = KeyManager.getKeys()
+    if (!keys) return
+
+    const escrows = await scanForEscrowsV4(rpc, keys, perRpc, scanCache)
+    const ours = escrows.filter((e) => e.isOurs && !e.isWithdrawn)
+    setPendingClaims(ours)
+  }, 10_000) // 10 seconds
+
+  return () => clearInterval(interval)
+}, [isInitialized])
 ```
 
 **✅ Acceptance Criteria for Step 9:**
 
 1. After calling `initializeKeys()` (from Step 8), the auto-claim hook should start scanning
 2. Check the console for scan logs:
+
 ```
 // Expected console output (first scan is slower):
 "Scanning for escrows... (first run, no cache)"
 "Found X deposit records, Y output escrows"
 "Matched Z escrows for our wallet"
 ```
+
 3. **If no payments have been sent to you:** `pendingClaims` array will be empty (`[]`) — this is correct
 4. **If you sent yourself a payment via the web app:** you should see 1+ items in `pendingClaims` within 20 seconds
 5. Verify scanning doesn't crash the app — watch for:
@@ -1652,6 +1851,7 @@ useEffect(() => {
    - No `RangeError` from buffer parsing (scanner offset wrong)
    - No memory spikes (each scan should be ~1-5MB, not growing)
 6. To verify scanning works with actual data, send 0.001 SOL via the web app to your mobile wallet address, then wait:
+
 ```
 // Expected after ~20 seconds:
 "Matched 1 escrows for our wallet"
@@ -1671,7 +1871,7 @@ Now design your home screen with NativeWind. Phantom's layout has:
 ┌──────────────────────────────────┐
 │  🔒 Privacy Badge     ⚙️ Gear   │  ← Top bar
 │                                  │
-│         $XX.XX                   │  ← Total balance  
+│         $XX.XX                   │  ← Total balance
 │        +X.X% ↑                   │  ← 24h change
 │                                  │
 │  [Receive] [Send] [Swap] [Buy]   │  ← Action buttons row
@@ -1690,7 +1890,7 @@ Now design your home screen with NativeWind. Phantom's layout has:
 
 **Key components to build:**
 
-1. **`BalanceCard`** — fetch SOL + token balances via `connection.getBalance()` and `getTokenAccountsByOwner()`
+1. **`BalanceCard`** — fetch SOL + token balances via `rpc.getBalance(address(pubkey)).send()` and `rpc.getTokenAccountsByOwner(address(pubkey)).send()`
 2. **`ActionButtons`** — row of circular buttons. **Send** button navigates to the Send flow
 3. **`TokenList`** — `FlatList` showing all tokens with Jupiter icon URLs (`https://img.icons8.com/...` or `cdn.jsdelivr.net`)
 4. **`PendingClaims`** — shows results from `useAutoClaim` hook
@@ -1730,7 +1930,7 @@ app/
 **Screen flow:**
 
 1. **Token Selection (`index.tsx`)** — Show user's tokens, tap to select
-2. **Recipient (`recipient.tsx`)** — Text input for address, validate with `PublicKey.isOnCurve()`, check if recipient is registered via `client.getRegistry()`
+2. **Recipient (`recipient.tsx`)** — Text input for address, validate with `isAddress(str)` from `@solana/kit`, check if recipient is registered via `client.getRegistry()`
 3. **Amount (`amount.tsx`)** — Numeric keypad, show max balance, handle SOL rent-exempt minimum
 4. **Confirm (`confirm.tsx`)** — Show summary, then:
    - IF not initialized → show "Initialize Keys" button → calls `initializeKeys()`
@@ -1773,6 +1973,7 @@ app/
 ```
 
 This screen uses `useAutoClaim`:
+
 - List pending `OutputEscrow` payments (amount, stealth pubkey truncated)
 - "Claim" button per item → calls `claimViaTEE()` on PER, then `withdrawFromOutputEscrow()` on L1 via Kora
 - Show claimed history with Solscan links
@@ -1799,15 +2000,15 @@ This screen uses `useAutoClaim`:
 
 ### Step 13 — Test End-to-End on Devnet
 
-| Test | How | Expected |
-|---|---|---|
-| **Init keys** | Tap "Initialize" → sign message | Keys derived, `isInitialized = true` |
-| **Register** | Tap "Register" (gasless via Kora) | Registry PDA created on-chain, `isRegistered = true` |
-| **Send SOL** | Send 0.01 SOL to another registered wallet | 4 TXs signed + submitted, crank triggered |
-| **Scan** | Wait 10-20s on receiver's app | Incoming payment appears in Activity tab |
-| **Claim** | Tap "Claim" on incoming payment | TEE claim on PER → Kora gasless withdrawal → SOL in wallet |
-| **Disconnect** | Disconnect wallet | Keys wiped, `isInitialized = false` |
-| **Re-connect** | Connect same wallet, re-initialize | Same keys derived (deterministic from signature) |
+| Test           | How                                        | Expected                                                   |
+| -------------- | ------------------------------------------ | ---------------------------------------------------------- |
+| **Init keys**  | Tap "Initialize" → sign message            | Keys derived, `isInitialized = true`                       |
+| **Register**   | Tap "Register" (gasless via Kora)          | Registry PDA created on-chain, `isRegistered = true`       |
+| **Send SOL**   | Send 0.01 SOL to another registered wallet | 4 TXs signed + submitted, crank triggered                  |
+| **Scan**       | Wait 10-20s on receiver's app              | Incoming payment appears in Activity tab                   |
+| **Claim**      | Tap "Claim" on incoming payment            | TEE claim on PER → Kora gasless withdrawal → SOL in wallet |
+| **Disconnect** | Disconnect wallet                          | Keys wiped, `isInitialized = false`                        |
+| **Re-connect** | Connect same wallet, re-initialize         | Same keys derived (deterministic from signature)           |
 
 > [!IMPORTANT]
 > For testing, you need **two wallets** both registered on devnet. Use the web app to register the second wallet, or register both from the mobile app.
@@ -1826,3 +2027,94 @@ Once the above all works:
 - [ ] Add transaction history persistence (local SQLite or your backend)
 - [ ] Add biometric lock for key initialization (FaceID/TouchID before signing)
 - [ ] Rate-limit RPC calls to avoid devnet throttling
+
+---
+
+## 17. Solana Kit Resources
+
+### Official Documentation
+
+- **Solana Kit GitHub:** https://github.com/anza-xyz/kit
+- **Solana Kit Docs:** https://www.solanakit.com/docs/getting-started
+- **API Reference:** https://www.solanakit.com/docs
+
+### Key Packages
+
+When using `@solana/kit`, you can import from the main package or use sub-packages for granular control:
+
+```typescript
+// Main package (recommended)
+import { createSolanaRpc, address, type Rpc, type SolanaRpcApi } from '@solana/kit'
+
+// Or sub-packages for tree-shaking
+import { createSolanaRpc } from '@solana/rpc'
+import { address, type Address } from '@solana/addresses'
+import { createTransactionMessage } from '@solana/transaction-messages'
+import { signTransactionMessageWithSigners } from '@solana/signers'
+```
+
+### Mobile-Specific Considerations with Solana Kit
+
+1. **RPC Transport:** Solana Kit's HTTP transport works in React Native without WebSocket issues
+2. **Address Type:** Use `Address` (string) instead of `PublicKey` class - simpler and more compatible
+3. **Transaction Building:** Use functional `pipe()` pattern for cleaner composition
+4. **Subscriptions:** For WebSocket subscriptions, use `createSolanaRpcSubscriptions()` - note that React Native WebSocket support may require polyfills
+
+### Example: Full Send Flow with Solana Kit
+
+```typescript
+import {
+  address,
+  createSolanaRpc,
+  createTransactionMessage,
+  setTransactionMessageFeePayer,
+  setTransactionMessageLifetimeUsingBlockhash,
+  appendTransactionMessageInstruction,
+  compileTransaction,
+  type Address,
+  type IInstruction,
+  type Rpc,
+  type SolanaRpcApi,
+} from '@solana/kit'
+
+async function sendSol(
+  rpc: Rpc<SolanaRpcApi>,
+  from: Address,
+  to: Address,
+  lamports: bigint,
+  signTransaction: (tx: any) => Promise<any>
+) {
+  // Get latest blockhash
+  const { value: blockhash } = await rpc.getLatestBlockhash().send()
+
+  // Build transfer instruction (System Program)
+  const transferIx: IInstruction = {
+    programAddress: address('11111111111111111111111111111111'), // System Program
+    accounts: [
+      { address: from, role: 3 }, // signer + writable
+      { address: to, role: 2 }, // writable
+    ],
+    data: Buffer.concat([
+      Buffer.from([2, 0, 0, 0, 0, 0, 0, 0]), // transfer discriminant
+      Buffer.from(new BigUint64Array([lamports]).buffer), // amount
+    ]),
+  }
+
+  // Build transaction
+  const tx = await pipe(
+    createTransactionMessage({ version: 0 }),
+    (tx) => setTransactionMessageFeePayer(from, tx),
+    (tx) => setTransactionMessageLifetimeUsingBlockhash(blockhash, tx),
+    (tx) => appendTransactionMessageInstruction(transferIx, tx)
+  )
+
+  // Sign and send
+  const signedTx = await signTransaction(tx)
+  const compiledTx = compileTransaction(signedTx)
+  const base64Tx = Buffer.from(compiledTx).toString('base64')
+
+  const signature = await rpc.sendTransaction(base64Tx, { encoding: 'base64' }).send()
+
+  return signature
+}
+```
