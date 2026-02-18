@@ -189,6 +189,33 @@ export const walletManager = {
         _activeIndex = index;
     },
 
+    // ── Account Management ───────────────────────────────────────────
+
+    /** Rename an account by its index */
+    renameAccount(index: number, newName: string): void {
+        if (index < 0 || index >= _accounts.length) {
+            throw new Error(`Invalid account index: ${index}`);
+        }
+        _accounts[index].name = newName.trim() || _accounts[index].name;
+    },
+
+    /** Remove an account by its index (cannot remove the last account) */
+    removeAccount(index: number): void {
+        if (_accounts.length <= 1) {
+            throw new Error("Cannot remove the last account.");
+        }
+        if (index < 0 || index >= _accounts.length) {
+            throw new Error(`Invalid account index: ${index}`);
+        }
+        _accounts.splice(index, 1);
+        // Adjust active index
+        if (_activeIndex >= _accounts.length) {
+            _activeIndex = _accounts.length - 1;
+        } else if (_activeIndex > index) {
+            _activeIndex--;
+        }
+    },
+
     // ── Reset ───────────────────────────────────────────────────────
 
     /** Wipe all wallet state */

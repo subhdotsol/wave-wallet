@@ -36,6 +36,7 @@ export default function RootLayout() {
         >
             <Stack.Screen name="(onboarding)" />
             <Stack.Screen name="(main)" />
+            <Stack.Screen name="(wallet)" />
         </Stack>
     );
 }

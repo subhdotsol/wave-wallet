@@ -50,6 +50,14 @@ function PlusIcon() {
     );
 }
 
+function PencilIcon() {
+    return (
+        <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+            <Path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="#888" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
+    );
+}
+
 // ─── Main Component ─────────────────────────────────────────────────
 
 export default function ProfileDrawer() {
@@ -170,6 +178,18 @@ export default function ProfileDrawer() {
                                         {acct.shortAddress}
                                     </Text>
                                 </View>
+
+                                {/* Edit Button */}
+                                <TouchableOpacity
+                                    onPress={(e) => {
+                                        e.stopPropagation();
+                                        router.push(`/(wallet)/edit-account?index=${idx}`);
+                                    }}
+                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                    className="p-2"
+                                >
+                                    <PencilIcon />
+                                </TouchableOpacity>
                             </TouchableOpacity>
                         );
                     })}
