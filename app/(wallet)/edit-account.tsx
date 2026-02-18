@@ -23,7 +23,7 @@ export default function EditAccount() {
 
     if (!account) {
         return (
-            <SafeAreaView className="flex-1 bg-[#0e0e1a] justify-center items-center">
+            <SafeAreaView className="flex-1 bg-[#121212] justify-center items-center">
                 <Text className="text-white text-lg" style={{ fontFamily: "Roboto-Bold" }}>
                     Account not found
                 </Text>
@@ -80,13 +80,13 @@ export default function EditAccount() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-[#0e0e1a]">
+        <SafeAreaView className="flex-1 bg-[#121212]">
             {/* Header */}
             <View className="flex-row items-center px-4 pt-2 pb-4 gap-2">
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
                     <BackArrowIcon />
                 </TouchableOpacity>
-                <Text className="text-white text-lg" style={{ fontFamily: "Roboto-Bold" }}>
+                <Text className="text-white text-[20px]" style={{ fontFamily: "Roboto-Bold" }}>
                     Edit Account
                 </Text>
             </View>
@@ -95,13 +95,13 @@ export default function EditAccount() {
                 {/* Account Avatar */}
                 <View className="items-center pt-4 pb-8">
                     <View className="relative">
-                        <View className="w-20 h-20 rounded-full bg-[#2a2a3e] justify-center items-center">
-                            <Text className="text-white text-2xl" style={{ fontFamily: "Roboto-Bold" }}>
+                        <View className="w-20 h-20 rounded-full bg-[#2a2a2a] justify-center items-center">
+                            <Text className="text-white text-[26px]" style={{ fontFamily: "Roboto-Bold" }}>
                                 A{accountIndex + 1}
                             </Text>
                         </View>
                         {/* Pencil overlay */}
-                        <View className="absolute -bottom-1 right-0 w-7 h-7 rounded-full bg-[#1e1e30] border border-[#2a2a3e] justify-center items-center">
+                        <View className="absolute -bottom-1 right-0 w-7 h-7 rounded-full bg-[#1c1c1e] border border-[#2a2a2a] justify-center items-center">
                             <PencilIcon size={14} />
                         </View>
                     </View>

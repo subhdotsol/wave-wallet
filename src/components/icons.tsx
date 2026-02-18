@@ -29,23 +29,23 @@ export function ChevronDownIcon({ size = 20, color = "#fff" }: { size?: number; 
 // ─── Tab Bar Icons ───────────────────────────────────────────────────
 
 export function HomeTabIcon({ active = false }: { active?: boolean }) {
-    return <MaterialIcons name="home" size={24} color={active ? ACCENT : MUTED} />;
+    return <MaterialIcons name="home" size={26} color={active ? ACCENT : MUTED} />;
 }
 
 export function CardTabIcon({ active = false }: { active?: boolean }) {
-    return <MaterialCommunityIcons name="credit-card-outline" size={24} color={active ? ACCENT : MUTED} />;
+    return <MaterialCommunityIcons name="credit-card-outline" size={26} color={active ? ACCENT : MUTED} />;
 }
 
 export function SwapTabIcon({ active = false }: { active?: boolean }) {
-    return <MaterialCommunityIcons name="swap-horizontal" size={24} color={active ? ACCENT : MUTED} />;
+    return <MaterialCommunityIcons name="swap-horizontal" size={26} color={active ? ACCENT : MUTED} />;
 }
 
 export function MessageTabIcon({ active = false }: { active?: boolean }) {
-    return <MaterialCommunityIcons name="message-outline" size={24} color={active ? ACCENT : MUTED} />;
+    return <MaterialCommunityIcons name="message-outline" size={26} color={active ? ACCENT : MUTED} />;
 }
 
 export function SearchTabIcon({ active = false }: { active?: boolean }) {
-    return <Feather name="search" size={24} color={active ? ACCENT : MUTED} />;
+    return <Feather name="search" size={26} color={active ? ACCENT : MUTED} />;
 }
 
 // ─── Action Buttons ──────────────────────────────────────────────────

@@ -30,8 +30,8 @@ export default function ShowRecoveryPhrase() {
 
     if (!mnemonic) {
         return (
-            <SafeAreaView className="flex-1 bg-[#0e0e1a] justify-center items-center px-6">
-                <Text className="text-white text-lg text-center" style={{ fontFamily: "Roboto-Bold" }}>
+            <SafeAreaView className="flex-1 bg-[#121212] justify-center items-center px-6">
+                <Text className="text-white text-[20px] text-center" style={{ fontFamily: "Roboto-Bold" }}>
                     No Recovery Phrase
                 </Text>
                 <Text className="text-[#888] text-sm text-center mt-2" style={{ fontFamily: "Roboto-Regular" }}>
@@ -53,13 +53,13 @@ export default function ShowRecoveryPhrase() {
     // ── Revealed State: Show the phrase grid ───────────────────────
     if (revealed) {
         return (
-            <SafeAreaView className="flex-1 bg-[#0e0e1a]">
+            <SafeAreaView className="flex-1 bg-[#121212]">
                 {/* Header */}
                 <View className="flex-row items-center px-4 pt-2 pb-4 gap-2">
                     <TouchableOpacity onPress={() => router.back()} className="p-1">
                         <BackArrowIcon />
                     </TouchableOpacity>
-                    <Text className="text-white text-lg" style={{ fontFamily: "Roboto-Bold" }}>Your Recovery Phrase</Text>
+                    <Text className="text-white text-[20px]" style={{ fontFamily: "Roboto-Bold" }}>Your Recovery Phrase</Text>
                 </View>
 
                 <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -79,7 +79,7 @@ export default function ShowRecoveryPhrase() {
                             {words.map((word, i) => (
                                 <View
                                     key={i}
-                                    className="flex-row items-center bg-[#1e1e30] rounded-xl px-3 py-3 border border-[#2a2a3e]"
+                                    className="flex-row items-center bg-[#1c1c1e] rounded-xl px-3 py-3 border border-[#2a2a2a]"
                                     style={{ width: "47%" }}
                                 >
                                     <Text className="text-[#666] text-sm mr-2 w-5" style={{ fontFamily: "Roboto-Regular" }}>
@@ -121,13 +121,13 @@ export default function ShowRecoveryPhrase() {
 
     // ── Warning Screen ─────────────────────────────────────────────
     return (
-        <SafeAreaView className="flex-1 bg-[#0e0e1a]">
+        <SafeAreaView className="flex-1 bg-[#121212]">
             {/* Header */}
             <View className="flex-row items-center px-4 pt-2 pb-4 gap-2">
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
                     <BackArrowIcon />
                 </TouchableOpacity>
-                <Text className="text-white text-lg" style={{ fontFamily: "Roboto-Bold" }}>Show Recovery Phrase</Text>
+                <Text className="text-white text-[20px]" style={{ fontFamily: "Roboto-Bold" }}>Show Recovery Phrase</Text>
             </View>
 
             <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
@@ -185,7 +185,7 @@ export default function ShowRecoveryPhrase() {
                     onPress={() => agreed && setRevealed(true)}
                     activeOpacity={agreed ? 0.7 : 1}
                     className="rounded-2xl py-4 items-center"
-                    style={{ backgroundColor: agreed ? "#3b82f6" : "#2a2a3e" }}
+                    style={{ backgroundColor: agreed ? "#3b82f6" : "#2a2a2a" }}
                 >
                     <Text
                         className="text-base"

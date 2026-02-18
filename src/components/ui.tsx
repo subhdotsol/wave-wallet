@@ -6,7 +6,7 @@ import { ChevronRightIcon } from "./icons";
 
 export function MenuSection({ children }: { children: React.ReactNode }) {
     return (
-        <View className="bg-[#161625] rounded-2xl mb-3 border border-[#1e1e30] overflow-hidden">
+        <View className="bg-[#1c1c1e] rounded-2xl mb-3 overflow-hidden">
             {children}
         </View>
     );
@@ -15,7 +15,7 @@ export function MenuSection({ children }: { children: React.ReactNode }) {
 // ─── Menu Divider ────────────────────────────────────────────────────
 
 export function MenuDivider({ inset = 16 }: { inset?: number }) {
-    return <View className="h-px bg-[#1e1e30]" style={{ marginLeft: inset }} />;
+    return <View className="h-px bg-[#2a2a2a]" style={{ marginLeft: inset }} />;
 }
 
 // ─── Menu Item ───────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ export function MenuItem({
         >
             {icon && <View className="mr-3.5">{icon}</View>}
             <Text
-                className="flex-1 text-[15px]"
+                className="flex-1 text-[16px]"
                 style={{
                     fontFamily: "Roboto-Medium",
                     color: destructive ? "#ef4444" : "#fff",
@@ -53,7 +53,7 @@ export function MenuItem({
             </Text>
             {rightText && (
                 <Text
-                    className="text-[#888] text-sm mr-2"
+                    className="text-[#888] text-[14px] mr-2"
                     style={{ fontFamily: "Roboto-Regular" }}
                 >
                     {rightText}

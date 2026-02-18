@@ -31,11 +31,10 @@ import {
 // ─── Data ───────────────────────────────────────────────────────────
 
 const TOKENS = [
-    { name: "Solana", symbol: "SOL", balance: "0", usdValue: "$0.00", usdSecondary: "$0.00", Logo: SolanaLogo, verified: true },
-    { name: "Ethereum", symbol: "ETH", balance: "0", usdValue: "$0.00", usdSecondary: "$0.00", Logo: EthereumLogo, verified: true },
-    { name: "Bitcoin", symbol: "BTC", balance: "0", usdValue: "$0.00", usdSecondary: "$0.00", Logo: BitcoinLogo, verified: true },
-    { name: "Monad", symbol: "MON", balance: "0", usdValue: "$0.00", usdSecondary: "$0.00", Logo: MonadLogo, verified: true },
-    { name: "Ethereum", symbol: "ETH", balance: "0", usdValue: "$0.00", usdSecondary: "$0.00", Logo: EthereumLogo, verified: true },
+    { name: "Solana", symbol: "SOL", balance: "0.00498", usdValue: "$0.42", change: "-$0.01", Logo: SolanaLogo, verified: true },
+    { name: "Ethereum", symbol: "ETH", balance: "0", usdValue: "$0.00", change: "$0.00", Logo: EthereumLogo, verified: true },
+    { name: "Bitcoin", symbol: "BTC", balance: "0", usdValue: "$0.00", change: "$0.00", Logo: BitcoinLogo, verified: true },
+    { name: "Monad", symbol: "MON", balance: "0", usdValue: "$0.00", change: "$0.00", Logo: MonadLogo, verified: true },
 ];
 
 const ACTION_BUTTONS = [
@@ -56,62 +55,80 @@ const TAB_ITEMS = [
 // ─── Main Component ─────────────────────────────────────────────────
 
 export default function Home() {
-    const [balanceVisible, setBalanceVisible] = useState(false);
+    const [balanceVisible, setBalanceVisible] = useState(true);
     const router = useRouter();
     const activeAccount = walletManager.getActiveAccount();
 
     return (
-        <SafeAreaView className="flex-1 bg-[#0e0e1a]">
+        <SafeAreaView className="flex-1 bg-[#121212]">
             {/* Header */}
-            <View className="flex-row items-center justify-between px-5 pt-2 pb-3">
-                <View className="flex-row items-center gap-3">
+            <View className="flex-row items-center justify-between px-5 pt-3 pb-2">
+                <TouchableOpacity
+                    onPress={() => router.push("/(main)/profile-drawer")}
+                    activeOpacity={0.7}
+                    className="flex-row items-center gap-3"
+                >
                     {/* Avatar */}
-                    <TouchableOpacity
-                        onPress={() => router.push("/(main)/profile-drawer")}
-                        activeOpacity={0.7}
-                        className="w-10 h-10 rounded-full bg-[#d4e157] justify-center items-center"
-                    >
-                        <Text className="text-xl">🌊</Text>
-                    </TouchableOpacity>
+                    <View className="w-[42px] h-[42px] rounded-full bg-[#d4e157] justify-center items-center">
+                        <Text className="text-[20px]">🌊</Text>
+                    </View>
                     {/* Name */}
                     <View>
-                        <Text className="text-gray-400 text-xs" style={{ fontFamily: "Roboto-Regular" }}>
+                        <Text className="text-[#999] text-[13px]" style={{ fontFamily: "Roboto-Regular" }}>
                             {activeAccount?.shortAddress ?? "No wallet"}
                         </Text>
-                        <Text className="text-white text-base" style={{ fontFamily: "Roboto-Bold" }}>
+                        <Text className="text-white text-[17px]" style={{ fontFamily: "Roboto-Bold" }}>
                             {activeAccount?.name ?? "Create Wallet"}
                         </Text>
                     </View>
-                </View>
-                <View className="flex-row items-center gap-4">
-                    <TouchableOpacity><ClockIcon /></TouchableOpacity>
-                    <TouchableOpacity><SearchIcon /></TouchableOpacity>
+                </TouchableOpacity>
+                <View className="flex-row items-center gap-5">
+                    <TouchableOpacity hitSlop={8}><ClockIcon size={26} /></TouchableOpacity>
+                    <TouchableOpacity hitSlop={8}><SearchIcon size={26} /></TouchableOpacity>
                 </View>
             </View>
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Balance Section */}
-                <View className="px-5 pt-4 pb-6">
-                    <TouchableOpacity onPress={() => setBalanceVisible(!balanceVisible)}>
-                        <Text className="text-white text-4xl" style={{ fontFamily: "Roboto-Bold" }}>
-                            {balanceVisible ? "$0.00" : "——"}
+                <TouchableOpacity
+                    className="px-5 pt-6 pb-2"
+                    activeOpacity={0.7}
+                    onPress={() => setBalanceVisible(!balanceVisible)}
+                >
+                    <Text
+                        className="text-white"
+                        style={{
+                            fontFamily: "Roboto-Bold",
+                            fontSize: 48,
+                            lineHeight: 56,
+                        }}
+                    >
+                        {balanceVisible ? "$0.42" : "••••"}
+                    </Text>
+                    <View className="flex-row items-center gap-2 mt-1">
+                        <Text className="text-[#ef4444] text-[15px]" style={{ fontFamily: "Roboto-Medium" }}>
+                            {balanceVisible ? "-$0.01" : ""}
                         </Text>
-                        <Text className="text-gray-500 text-lg mt-1" style={{ fontFamily: "Roboto-Regular" }}>
-                            {balanceVisible ? "$0.00" : "·"}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+                        {balanceVisible && (
+                            <View className="bg-[#ef4444]/20 rounded-md px-2 py-0.5">
+                                <Text className="text-[#ef4444] text-[13px]" style={{ fontFamily: "Roboto-Medium" }}>
+                                    -0.18%
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                </TouchableOpacity>
 
                 {/* Action Buttons */}
-                <View className="flex-row justify-between px-5 mb-8">
+                <View className="flex-row justify-between px-5 mt-6 mb-8">
                     {ACTION_BUTTONS.map((btn) => (
                         <TouchableOpacity
                             key={btn.label}
                             activeOpacity={0.7}
-                            className="w-[78px] h-[78px] rounded-2xl bg-[#1a1a2e] justify-center items-center border border-[#2a2a3e]"
+                            className="flex-1 mx-1.5 rounded-2xl bg-[#1c1c1e] justify-center items-center py-4"
                         >
-                            <btn.Icon />
-                            <Text className="text-gray-300 text-xs mt-1.5" style={{ fontFamily: "Roboto-Medium" }}>
+                            <btn.Icon size={26} />
+                            <Text className="text-gray-300 text-[13px] mt-2" style={{ fontFamily: "Roboto-Medium" }}>
                                 {btn.label}
                             </Text>
                         </TouchableOpacity>
@@ -119,9 +136,9 @@ export default function Home() {
                 </View>
 
                 {/* Tokens Section Header */}
-                <TouchableOpacity className="flex-row items-center px-5 mb-4">
-                    <Text className="text-white text-xl mr-1" style={{ fontFamily: "Roboto-Bold" }}>Tokens</Text>
-                    <ChevronRightIcon size={16} color="#fff" />
+                <TouchableOpacity className="flex-row items-center px-5 mb-5">
+                    <Text className="text-white text-[22px] mr-1" style={{ fontFamily: "Roboto-Bold" }}>Tokens</Text>
+                    <ChevronRightIcon size={20} color="#fff" />
                 </TouchableOpacity>
 
                 {/* Token List */}
@@ -130,31 +147,37 @@ export default function Home() {
                         <TouchableOpacity
                             key={`${token.symbol}-${index}`}
                             activeOpacity={0.7}
-                            className="flex-row items-center bg-[#161625] rounded-2xl p-3.5 mb-2 border border-[#1e1e30]"
+                            className="flex-row items-center bg-[#1c1c1e] rounded-2xl px-4 py-4 mb-2.5"
                         >
                             {/* Token Logo */}
                             <token.Logo />
 
                             {/* Token Info */}
-                            <View className="flex-1 ml-3">
-                                <View className="flex-row items-center gap-1">
-                                    <Text className="text-white text-base" style={{ fontFamily: "Roboto-Bold" }}>
+                            <View className="flex-1 ml-3.5">
+                                <View className="flex-row items-center gap-1.5">
+                                    <Text className="text-white text-[17px]" style={{ fontFamily: "Roboto-Bold" }}>
                                         {token.name}
                                     </Text>
-                                    {token.verified && <VerifiedBadge />}
+                                    {token.verified && <VerifiedBadge size={18} />}
                                 </View>
-                                <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "Roboto-Regular" }}>
+                                <Text className="text-[#888] text-[14px] mt-1" style={{ fontFamily: "Roboto-Regular" }}>
                                     {token.balance} {token.symbol}
                                 </Text>
                             </View>
 
                             {/* Token Value */}
                             <View className="items-end">
-                                <Text className="text-white text-base" style={{ fontFamily: "Roboto-Bold" }}>
+                                <Text className="text-white text-[17px]" style={{ fontFamily: "Roboto-Bold" }}>
                                     {token.usdValue}
                                 </Text>
-                                <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "Roboto-Regular" }}>
-                                    {token.usdSecondary}
+                                <Text
+                                    className="text-[14px] mt-1"
+                                    style={{
+                                        fontFamily: "Roboto-Regular",
+                                        color: token.change.startsWith("-") ? "#ef4444" : "#888",
+                                    }}
+                                >
+                                    {token.change}
                                 </Text>
                             </View>
                         </TouchableOpacity>
@@ -166,7 +189,7 @@ export default function Home() {
             </ScrollView>
 
             {/* Bottom Tab Bar */}
-            <View className="absolute bottom-0 left-0 right-0 bg-[#0e0e1a] border-t border-[#1e1e30] pb-[30px] pt-3">
+            <View className="absolute bottom-0 left-0 right-0 bg-[#121212] border-t border-[#2a2a2a] pb-[30px] pt-3">
                 <View className="flex-row justify-around items-center px-4">
                     {TAB_ITEMS.map((tab) => (
                         <TouchableOpacity

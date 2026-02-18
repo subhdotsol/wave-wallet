@@ -40,8 +40,8 @@ export default function ShowPrivateKey() {
 
     if (!account) {
         return (
-            <SafeAreaView className="flex-1 bg-[#0e0e1a] justify-center items-center px-6">
-                <Text className="text-white text-lg text-center" style={{ fontFamily: "Roboto-Bold" }}>
+            <SafeAreaView className="flex-1 bg-[#121212] justify-center items-center px-6">
+                <Text className="text-white text-[20px] text-center" style={{ fontFamily: "Roboto-Bold" }}>
                     Account not found
                 </Text>
                 <TouchableOpacity onPress={() => router.back()} className="mt-6 bg-[#3b82f6] rounded-2xl py-4 px-10">
@@ -60,13 +60,13 @@ export default function ShowPrivateKey() {
     // ── Revealed State: Show the private key ───────────────────────
     if (revealed) {
         return (
-            <SafeAreaView className="flex-1 bg-[#0e0e1a]">
+            <SafeAreaView className="flex-1 bg-[#121212]">
                 {/* Header */}
                 <View className="flex-row items-center px-4 pt-2 pb-4 gap-2">
                     <TouchableOpacity onPress={() => router.back()} className="p-1">
                         <BackArrowIcon />
                     </TouchableOpacity>
-                    <Text className="text-white text-lg" style={{ fontFamily: "Roboto-Bold" }}>Your Private Key</Text>
+                    <Text className="text-white text-[20px]" style={{ fontFamily: "Roboto-Bold" }}>Your Private Key</Text>
                 </View>
 
                 <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -81,7 +81,7 @@ export default function ShowPrivateKey() {
                     </View>
 
                     {/* Private Key Display */}
-                    <View className="mx-5 bg-[#1e1e30] rounded-2xl p-5 border border-[#2a2a3e]">
+                    <View className="mx-5 bg-[#1c1c1e] rounded-2xl p-5 border border-[#2a2a2a]">
                         <Text className="text-white text-[15px] leading-[24px] text-center" style={{ fontFamily: "Roboto-Medium" }}>
                             {privateKey}
                         </Text>
@@ -115,13 +115,13 @@ export default function ShowPrivateKey() {
 
     // ── Warning Screen ─────────────────────────────────────────────
     return (
-        <SafeAreaView className="flex-1 bg-[#0e0e1a]">
+        <SafeAreaView className="flex-1 bg-[#121212]">
             {/* Header */}
             <View className="flex-row items-center px-4 pt-2 pb-4 gap-2">
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
                     <BackArrowIcon />
                 </TouchableOpacity>
-                <Text className="text-white text-lg" style={{ fontFamily: "Roboto-Bold" }}>Your Private Key</Text>
+                <Text className="text-white text-[20px]" style={{ fontFamily: "Roboto-Bold" }}>Your Private Key</Text>
             </View>
 
             <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
@@ -179,7 +179,7 @@ export default function ShowPrivateKey() {
                     onPress={() => agreed && setRevealed(true)}
                     activeOpacity={agreed ? 0.7 : 1}
                     className="rounded-2xl py-4 items-center"
-                    style={{ backgroundColor: agreed ? "#3b82f6" : "#2a2a3e" }}
+                    style={{ backgroundColor: agreed ? "#3b82f6" : "#2a2a2a" }}
                 >
                     <Text
                         className="text-base"

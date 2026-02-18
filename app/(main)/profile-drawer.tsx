@@ -49,54 +49,54 @@ export default function ProfileDrawer() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-[#0e0e1a]">
+        <SafeAreaView className="flex-1 bg-[#121212]">
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Header: Avatar + Close */}
-                <View className="flex-row justify-between items-start px-5 pt-2 pb-4">
-                    <View className="flex-row items-center gap-3">
+                <View className="flex-row justify-between items-start px-5 pt-3 pb-5">
+                    <View className="flex-row items-center gap-3.5">
                         {/* Avatar */}
-                        <View className="w-11 h-11 rounded-full bg-[#d4e157] justify-center items-center">
-                            <Text className="text-[22px]">🌊</Text>
+                        <View className="w-12 h-12 rounded-full bg-[#d4e157] justify-center items-center">
+                            <Text className="text-[24px]">🌊</Text>
                         </View>
                         {/* Name + Address */}
                         <View>
-                            <Text className="text-white text-lg" style={{ fontFamily: "Roboto-Bold" }}>
+                            <Text className="text-white text-[20px]" style={{ fontFamily: "Roboto-Bold" }}>
                                 {activeAccount?.name ?? "Wave Wallet"}
                             </Text>
-                            <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "Roboto-Regular" }}>
+                            <Text className="text-[#888] text-[14px] mt-0.5" style={{ fontFamily: "Roboto-Regular" }}>
                                 {activeAccount?.shortAddress ?? "No wallet"}
                             </Text>
                         </View>
                     </View>
-                    <TouchableOpacity onPress={() => router.back()} className="p-1 mt-1">
-                        <CloseIcon />
+                    <TouchableOpacity onPress={() => router.back()} className="p-1 mt-2">
+                        <CloseIcon size={26} />
                     </TouchableOpacity>
                 </View>
 
                 {/* Profile / Settings Buttons */}
-                <View className="flex-row px-5 gap-3 mb-7">
+                <View className="flex-row px-5 gap-3 mb-8">
                     <TouchableOpacity
                         onPress={() => router.push("/(main)/profile")}
                         activeOpacity={0.7}
-                        className="flex-1 bg-[#1e1e30] rounded-[14px] py-4 items-center gap-1.5 border border-[#2a2a3e]"
+                        className="flex-1 bg-[#1c1c1e] rounded-2xl py-5 items-center gap-2"
                     >
-                        <ProfileIcon />
-                        <Text className="text-white text-[13px]" style={{ fontFamily: "Roboto-Medium" }}>Profile</Text>
+                        <ProfileIcon size={30} />
+                        <Text className="text-white text-[14px]" style={{ fontFamily: "Roboto-Medium" }}>Profile</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={() => router.push("/(main)/settings")}
                         activeOpacity={0.7}
-                        className="flex-1 bg-[#1e1e30] rounded-[14px] py-4 items-center gap-1.5 border border-[#2a2a3e]"
+                        className="flex-1 bg-[#1c1c1e] rounded-2xl py-5 items-center gap-2"
                     >
-                        <Feather name="settings" size={28} color="#fff" />
-                        <Text className="text-white text-[13px]" style={{ fontFamily: "Roboto-Medium" }}>Settings</Text>
+                        <Feather name="settings" size={30} color="#fff" />
+                        <Text className="text-white text-[14px]" style={{ fontFamily: "Roboto-Medium" }}>Settings</Text>
                     </TouchableOpacity>
                 </View>
 
                 {/* Your Accounts */}
                 <View className="px-5">
-                    <Text className="text-white text-xl mb-3.5" style={{ fontFamily: "Roboto-Bold" }}>
+                    <Text className="text-white text-[22px] mb-4" style={{ fontFamily: "Roboto-Bold" }}>
                         Your Accounts
                     </Text>
 
@@ -107,15 +107,15 @@ export default function ProfileDrawer() {
                                 key={acct.address}
                                 activeOpacity={0.7}
                                 onPress={() => handleSwitchAccount(idx)}
-                                className="flex-row items-center rounded-[14px] p-4 mb-2.5 border"
+                                className="flex-row items-center rounded-2xl p-4 mb-3 border"
                                 style={{
-                                    backgroundColor: isActive ? "#1e1e30" : "#161622",
-                                    borderColor: isActive ? "#3b82f6" : "#2a2a3e",
+                                    backgroundColor: isActive ? "#1c1c1e" : "#181818",
+                                    borderColor: isActive ? "#3b82f6" : "#2a2a2a",
                                 }}
                             >
                                 {/* Account Badge */}
-                                <View className="w-11 h-11 rounded-full bg-[#2a2a3e] justify-center items-center relative">
-                                    <Text className="text-white text-sm" style={{ fontFamily: "Roboto-Bold" }}>
+                                <View className="w-12 h-12 rounded-full bg-[#2a2a2a] justify-center items-center relative">
+                                    <Text className="text-white text-[15px]" style={{ fontFamily: "Roboto-Bold" }}>
                                         A{idx + 1}
                                     </Text>
                                     {isActive && (
@@ -126,11 +126,11 @@ export default function ProfileDrawer() {
                                 </View>
 
                                 {/* Account Info */}
-                                <View className="flex-1 ml-3">
-                                    <Text className="text-white text-base" style={{ fontFamily: "Roboto-Bold" }}>
+                                <View className="flex-1 ml-3.5">
+                                    <Text className="text-white text-[17px]" style={{ fontFamily: "Roboto-Bold" }}>
                                         {acct.name}
                                     </Text>
-                                    <Text className="text-[#888] text-[13px] mt-0.5" style={{ fontFamily: "Roboto-Regular" }}>
+                                    <Text className="text-[#888] text-[14px] mt-1" style={{ fontFamily: "Roboto-Regular" }}>
                                         {acct.shortAddress}
                                     </Text>
                                 </View>
@@ -144,15 +144,15 @@ export default function ProfileDrawer() {
                                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                                     className="p-2"
                                 >
-                                    <PencilIcon />
+                                    <PencilIcon size={18} />
                                 </TouchableOpacity>
                             </TouchableOpacity>
                         );
                     })}
 
                     {accounts.length === 0 && (
-                        <View className="bg-[#1e1e30] rounded-[14px] p-5 items-center border border-[#2a2a3e]">
-                            <Text className="text-[#888] text-base" style={{ fontFamily: "Roboto-Regular" }}>
+                        <View className="bg-[#1c1c1e] rounded-2xl p-5 items-center">
+                            <Text className="text-[#888] text-[16px]" style={{ fontFamily: "Roboto-Regular" }}>
                                 No accounts yet
                             </Text>
                         </View>
@@ -167,15 +167,15 @@ export default function ProfileDrawer() {
                     activeOpacity={0.7}
                     className="rounded-2xl py-4 flex-row items-center justify-center gap-2"
                     style={{
-                        backgroundColor: hasMnemonic ? "#3b82f6" : "#2a2a3e",
+                        backgroundColor: hasMnemonic ? "#3b82f6" : "#2a2a2a",
                     }}
                 >
-                    <PlusIcon size={18} color={hasMnemonic ? "#0e0e1a" : "#555"} />
+                    <PlusIcon size={20} color={hasMnemonic ? "#fff" : "#555"} />
                     <Text
-                        className="text-base"
+                        className="text-[16px]"
                         style={{
                             fontFamily: "Roboto-Bold",
-                            color: hasMnemonic ? "#0e0e1a" : "#555",
+                            color: hasMnemonic ? "#fff" : "#555",
                         }}
                     >
                         Add Account

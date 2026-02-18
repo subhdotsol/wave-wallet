@@ -28,23 +28,23 @@ export default function Settings() {
     const router = useRouter();
 
     return (
-        <SafeAreaView className="flex-1 bg-[#0e0e1a]">
+        <SafeAreaView className="flex-1 bg-[#121212]">
             {/* Header */}
-            <View className="flex-row justify-between items-center px-5 pt-2 pb-4">
-                <Text className="text-white text-[28px]" style={{ fontFamily: "Roboto-Bold" }}>Settings</Text>
+            <View className="flex-row justify-between items-center px-5 pt-3 pb-5">
+                <Text className="text-white text-[30px]" style={{ fontFamily: "Roboto-Bold" }}>Settings</Text>
                 <TouchableOpacity onPress={() => router.back()} className="p-1">
-                    <CloseIcon />
+                    <CloseIcon size={26} />
                 </TouchableOpacity>
             </View>
 
             <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
                 {/* Search Bar */}
-                <View className="flex-row items-center bg-[#1e1e30] rounded-xl px-3.5 py-3 mb-4 gap-2.5">
-                    <SearchIcon size={18} color="#666" />
+                <View className="flex-row items-center bg-[#1c1c1e] rounded-xl px-4 py-3.5 mb-5 gap-3">
+                    <SearchIcon size={20} color="#666" />
                     <TextInput
                         placeholder="Search"
                         placeholderTextColor="#666"
-                        className="flex-1 text-white text-[15px] p-0"
+                        className="flex-1 text-white text-[16px] p-0"
                         style={{ fontFamily: "Roboto-Regular" }}
                     />
                 </View>
@@ -56,44 +56,44 @@ export default function Settings() {
                         activeOpacity={0.7}
                         className="flex-row items-center p-4"
                     >
-                        <View className="w-10 h-10 rounded-full bg-[#d4e157] justify-center items-center mr-3">
+                        <View className="w-11 h-11 rounded-full bg-[#d4e157] justify-center items-center mr-3.5">
                             <Text className="text-lg">🌊</Text>
                         </View>
-                        <Text className="text-white text-base flex-1" style={{ fontFamily: "Roboto-Bold" }}>@wavewallet</Text>
+                        <Text className="text-white text-[17px] flex-1" style={{ fontFamily: "Roboto-Bold" }}>@wavewallet</Text>
                         <ChevronRightIcon />
                     </TouchableOpacity>
                 </MenuSection>
 
                 {/* Account Management Group */}
                 <MenuSection>
-                    <MenuItem icon={<ManageAccountsIcon />} label="Manage Accounts" rightText="2" />
+                    <MenuItem icon={<ManageAccountsIcon size={24} />} label="Manage Accounts" rightText="2" />
                     <MenuDivider inset={52} />
-                    <MenuItem icon={<PreferencesIcon />} label="Preferences" />
+                    <MenuItem icon={<PreferencesIcon size={24} />} label="Preferences" />
                     <MenuDivider inset={52} />
-                    <MenuItem icon={<SecurityIcon />} label="Security & Privacy" />
+                    <MenuItem icon={<SecurityIcon size={24} />} label="Security & Privacy" />
                 </MenuSection>
 
                 {/* Network & Apps Group */}
                 <MenuSection>
-                    <MenuItem icon={<GlobeIcon />} label="Active Networks" rightText="All" />
+                    <MenuItem icon={<GlobeIcon size={24} />} label="Active Networks" rightText="All" />
                     <MenuDivider inset={52} />
-                    <MenuItem icon={<AddressBookIcon />} label="Address Book" />
+                    <MenuItem icon={<AddressBookIcon size={24} />} label="Address Book" />
                     <MenuDivider inset={52} />
-                    <MenuItem icon={<ConnectedAppsIcon />} label="Connected Apps" />
+                    <MenuItem icon={<ConnectedAppsIcon size={24} />} label="Connected Apps" />
                 </MenuSection>
 
                 {/* Developer */}
                 <MenuSection>
-                    <MenuItem icon={<DevSettingsIcon />} label="Developer Settings" />
+                    <MenuItem icon={<DevSettingsIcon size={24} />} label="Developer Settings" />
                 </MenuSection>
 
                 {/* Support & About */}
                 <MenuSection>
-                    <MenuItem icon={<HelpIcon />} label="Help & Support" />
+                    <MenuItem icon={<HelpIcon size={24} />} label="Help & Support" />
                     <MenuDivider inset={52} />
-                    <MenuItem icon={<HeartIcon />} label="Invite your friends" rightIcon={<ShareIcon />} />
+                    <MenuItem icon={<HeartIcon size={24} />} label="Invite your friends" rightIcon={<ShareIcon size={20} />} />
                     <MenuDivider inset={52} />
-                    <MenuItem icon={<AboutIcon />} label="About Phantom" />
+                    <MenuItem icon={<AboutIcon size={24} />} label="About Phantom" />
                 </MenuSection>
 
                 {/* Bottom spacer */}
